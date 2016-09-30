@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_cart"
+            android:icon="@drawable/cart"
+            android:title="Cart" />
+        <item
+            android:id="@+id/nav_return"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Returns &amp; Exchange" />
+        <item
+            android:id="@+id/nav_reports"
+            android:icon="@drawable/report"
+            android:title="Reports" />
+        <item
+            android:id="@+id/nav_reciept"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Receipt/Gift receipt" />
+        <item
+            android:id="@+id/nav_customer"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Members" />
+
+    </group>
+
+    <item android:title="Other">
+        <menu> <item
+            android:id="@+id/nav_tools"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Tools" />
+            <item
+                android:id="@+id/nav_setting"
+                android:icon="@drawable/ic_settings_applications_black_24dp"
+                android:title="Setting &amp; Setup" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Logout" />
+            <item
+                android:id="@+id/nav_help"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Help" />
+        </menu>
+    </item>
+
+</menu>
