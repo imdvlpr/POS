@@ -35,8 +35,10 @@ import com.ankit.pointofsolution.api.ResponseCodes;
 import com.ankit.pointofsolution.config.Constants;
 import com.ankit.pointofsolution.config.Messages;
 import com.ankit.pointofsolution.config.StringUtils;
+import com.ankit.pointofsolution.storage.DBHelper;
 import com.ankit.pointofsolution.storage.Preferences;
 import com.ankit.pointofsolution.utility.NetworkOperations;
+import com.ankit.pointofsolution.utility.Utility;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -69,6 +71,8 @@ public class DeviceVerificationActivity extends AppCompatActivity  {
     private ProgressDialog prgLoading = null;
     private Preferences preferences;
     JSONObject jsonObj;
+    DBHelper dbhelper;
+    private Utility utility;
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -86,6 +90,8 @@ public class DeviceVerificationActivity extends AppCompatActivity  {
         verifyBtn = (Button) findViewById(R.id.Verification_button);
         VerificationCode = (EditText) findViewById(R.id.VerificationCode);
         preferences = new Preferences(activity);
+        dbhelper = new DBHelper(this);
+        utility = new Utility(preferences, dbhelper);
 
         final StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -277,8 +283,20 @@ public class DeviceVerificationActivity extends AppCompatActivity  {
                                     jsonObj = new JSONObject(sResponseDesc);
                                     preferences.setUserData(jsonObj.getJSONArray(Constants.USERS).toString());
                                     preferences.setProductData(jsonObj.getJSONArray(Constants.PRODUCTS).toString());
-                                } catch (Exception e) {
+                                    // JSONArray jArray = jsonObj.getJSONArray(Constants.USERS.toString());
+                                    utility.saveItemsindb(sResponseDesc);
+                                    /*JSONArray jArray = jsonObj.getJSONArray(Constants.PRODUCTS.toString());
+                                    for(int i=0;i<jArray.length();i++)
+                                    {
+                                       JSONObject json_data = jArray.getJSONObject(i);
+                                       String productName = json_data.getString("productName");
+                                       String productPrice= json_data.getString("price");
+                                       String productBrand= json_data.getString("brand");
+                                       String productSku= json_data.getString("sku");
+                                       dbhelper.insertItem(productPrice,productName,productBrand, productSku);
+                                    }*/
                                 }
+                                catch (Exception e) {}
                                 preferences.setisDeviceVerified(true);
                                 startActivity(new Intent(DeviceVerificationActivity.this, LoginActivity.class));
                                 finish();

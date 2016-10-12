@@ -20,7 +20,7 @@ import com.ankit.pointofsolution.R;
  * Use the {@link ItemFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ItemFragment extends ListFragment {
+public class ItemFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -117,11 +117,5 @@ public class ItemFragment extends ListFragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
 
-        /** Invokes the implementation of the method onListFragmentItemClick in the hosting activity */
-        ifaceItemClickListener.onListFragmentItemClick(position);
-
-    }
 }

@@ -35,7 +35,7 @@ public class Constants {
 	public static final String ORDER_INITIAL_STATUS = "IN_PROGRESS";
 	public static final String ORDER_FINAL_STATUS = "COMPLETED";
 	// Spinner loop max values
-	public static final int QUANTITY_MAX_VALUE = 999;
+	public static final int QUANTITY_MAX_VALUE = 5;
 	public static final Integer INITIAL_ORDER_ID = 100001;
 
 	//Status Keys & values
@@ -45,6 +45,9 @@ public class Constants {
 	public static final String KEY_TIMESTAMP = "orderTimestamp";
 	public static final String KEY_EDIT_ORDER = "editorder";
 	public static final String KEY_EDIT_ORDER_VALUE = "editorderValue";
+	public static final String KEY_CASH_PAYMENT = "CASH_PAYMENT";
+	public static final String KEY_DEBIT_CARD_PAYMENT = "DEBIT_CARD_PAYMENT";
+	public static final String KEY_PAYMENT_STATUS = "SUCCESS";
 	//db helpers
 
 

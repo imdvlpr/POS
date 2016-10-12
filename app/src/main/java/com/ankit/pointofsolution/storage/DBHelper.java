@@ -41,6 +41,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String ORDERS_COLUMN_ORDERPROMOTIONS = "orderPromotions";
     public static final String ORDERS_COLUMN_ORDERCREATEDAT = "orderCreatedAt";
     public static final String ORDERS_COLUMN_ORDERUPDATEDAT = "orderUpdatedAt";
+    public static final String ORDERS_COLUMN_PAYMENTTYPE = "orderPaymentType";
+    public static final String ORDERS_COLUMN_PAYMENTSTATUS = "orderPaymentStatus";
 
     //Orders Constants
     public static final String OD_TABLE_NAME = "order_details";
@@ -51,6 +53,17 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String OD_COLUMN_PRODUCTQTY = "productQty";
     public static final String OD_COLUMN_PRODUCTPRICE = "productPrice";
     public static final String OD_COLUMN_PRODUCTNAME = "productName";
+
+    //Item Constants
+
+    public static final String ITEM_TABLE_NAME = "items";
+    public static final String ITEM_COLUMN_ID = "itemId";
+    public static final String ITEM_COLUMN_NAME = "itemName";
+    public static final String ITEM_COLUMN_PRICE = "itemPrice";
+    public static final String ITEM_COLUMN_BRAND = "itemBrand";
+    public static final String ITEM_COLUMN_ADMINCODE= "itemAdminCode";
+    public static final String ITEM_COLUMN_SKUCODE = "itemSkuCode";
+
 
     private HashMap hp;
 
@@ -68,14 +81,23 @@ public class DBHelper extends SQLiteOpenHelper {
         //Create orders query
         String orders_qry = "create table " +ORDERS_TABLE_NAME+
                 "(oId integer primary key, orderId text, orderStatus text,orderStorageStatus text,orderOffers text," +
-                            "orderPromotions text, orderCreatedAt text,orderUpdatedAt text)";
+                 "orderPromotions text, orderPaymentType text, orderPaymentStatus text, orderCreatedAt text, " +
+                 "orderUpdatedAt text )";
 //        System.out.println("onCreate: orders_qry: "+ orders_qry);
         db.execSQL(orders_qry);
         //Create order details query
         String order_details_qry = "create table " +OD_TABLE_NAME+
-                "(odId integer primary key, orderId text, productSku text,productQty text,productPrice text,productName text)";
+                "(odId integer primary key, orderId text, productSku text,productQty text,productPrice text,productName text )";
 //        System.out.println("onCreate: order_details_qry: "+ order_details_qry);
         db.execSQL(order_details_qry);
+
+        //Create item query
+        String item_qry = "create table "+ITEM_TABLE_NAME+" " +
+                "(itemId integer primary key, itemSkuCode text, itemName text, itemPrice text, itemBrand text, itemAdminCode text," +
+                "itemOffers text, itemPromotions text, itemTax text, itemCreatedBy text, itemCreatedAt text, itemUpdatedBy text," +
+                "itemUpdatedAt text, itemStatus text default 'active')";
+        db.execSQL(item_qry);
+
     }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -211,11 +233,13 @@ public class DBHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public boolean updateOrderStatus(String orderId, String orderStatus)
+    public boolean updateOrderStatus(String orderId, String paymentType, String paymentStatus, String orderStatus)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(ORDERS_COLUMN_ORDERSTATUS, orderStatus);
+        contentValues.put(ORDERS_COLUMN_PAYMENTTYPE, paymentType);
+        contentValues.put(ORDERS_COLUMN_PAYMENTSTATUS, paymentStatus);
         db.update(ORDERS_TABLE_NAME, contentValues, "orderId = ? ", new String[] { orderId } );
         return true;
     }
@@ -265,7 +289,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 OrderDetails orderDetails = new OrderDetails();
                 orderDetails.setItemSku(res.getString(res.getColumnIndex(OD_COLUMN_PRODUCTSKU)));
                 orderDetails.setItemPrice(Float.parseFloat(res.getString(res.getColumnIndex(OD_COLUMN_PRODUCTPRICE))));
-                orderDetails.setItemQty(Integer.parseInt(res.getString(res.getColumnIndex(OD_COLUMN_PRODUCTQTY))));
+                orderDetails.setItemQty(Float.parseFloat(res.getString(res.getColumnIndex(OD_COLUMN_PRODUCTQTY))));
                 orderDetails.setsItemName(res.getString(res.getColumnIndex(OD_COLUMN_PRODUCTNAME)));
                 orderDetailsArrayList.add(orderDetails);
             } while (res.moveToNext());
@@ -345,6 +369,23 @@ public class DBHelper extends SQLiteOpenHelper {
             res.moveToNext();
         }
         return array_list;
+    }
+
+    //Items table operations
+    public boolean insertItem(String itemPrice,String itemName,String brand,String SkuCode)
+    {
+        String itemCreatedAt = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(new Date());
+        //System.out.println("itemList: " + itemPrice + ", " + itemName + " , " + SkuCode);
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("itemPrice", itemPrice);
+        contentValues.put("itemName", itemName);
+        contentValues.put("itemSkuCode", SkuCode);
+        contentValues.put("itemBrand", brand);
+        contentValues.put("itemCreatedAt", itemCreatedAt);
+        contentValues.put("itemUpdatedAt", itemCreatedAt);
+        db.insert(ITEM_TABLE_NAME, null, contentValues);
+        return true;
     }
 
 }

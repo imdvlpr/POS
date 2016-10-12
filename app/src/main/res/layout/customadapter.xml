@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:baselineAligned="true"
         android:padding="@dimen/card_margin"
-        android:visibility="gone"
+        android:visibility="visible"
         android:id="@+id/Linearview"
         android:orientation="horizontal">
 
@@ -84,7 +84,12 @@
             android:background="@drawable/qtyedieextstyle"
             android:layout_weight="1"
             />-->
-
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:baselineAligned="true"
+            android:orientation="vertical"
+            android:layout_weight="0.3">
         <Spinner
             android:id="@+id/LitemQty"
             android:layout_width="wrap_content"
@@ -94,7 +99,15 @@
             android:layout_marginTop="2dp"
             android:padding="3dp"
              ></Spinner>
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/moreQuantity"
+                android:layout_marginTop="10dp"
+                android:textSize="@dimen/orignal_price"
+                android:layout_weight="1"
+                />
+</LinearLayout>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

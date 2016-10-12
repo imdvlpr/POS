@@ -349,7 +349,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 if(userdataList.get(i).userId.equals(mEmail)) {
                     userIdList.add(userdataList.get(i).userId);
                     passwordList.add(userdataList.get(i).encryptedPassword);
-//                    System.out.println("userdata :" + i + ":" + userIdList.toString() + ":" + passwordList.toString());
+                    System.out.println("userdata :" + i + ":" + userIdList.toString() + ":" + passwordList.toString());
                     break;
                 }
             }

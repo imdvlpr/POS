@@ -9,4 +9,5 @@ public interface GetResponseDialogListener {
 
     void updateResult(boolean response);
     void updateResultSkuCode(Productdata response);
+    void moreOptionClickAddSpinner(String quantity);
 }

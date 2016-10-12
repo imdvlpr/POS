@@ -119,10 +119,10 @@ public class OrdersAdapter extends BaseAdapter implements View.OnClickListener{
         @Override
         public void onClick(final View v) {
             System.out.println("ye yaha to he :"+ mPosition);
-
+/*
             FragmentTransaction fragTransaction = activity.getFragmentManager().beginTransaction();
             fragTransaction.replace(R.id.frame_container, ListofOrdersActivity.itemFragment).addToBackStack(null);
-            fragTransaction.show(ListofOrdersActivity.itemFragment);
+            fragTransaction.show(ListofOrdersActivity.itemFragment);*/
         }
     }
 

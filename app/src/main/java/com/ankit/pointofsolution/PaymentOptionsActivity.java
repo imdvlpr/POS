@@ -56,7 +56,8 @@ public class PaymentOptionsActivity extends MainActivity {
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dbHelper.updateOrderStatus(pref.getCurrentOdrerId(),Constants.ORDER_FINAL_STATUS);
+                dbHelper.updateOrderStatus(pref.getCurrentOdrerId(), Constants.KEY_CASH_PAYMENT
+                , Constants.KEY_PAYMENT_STATUS, Constants.ORDER_FINAL_STATUS);
                 Intent i = new Intent(PaymentOptionsActivity.this,MainActivity.class);
                 startActivity(i);
             }
@@ -68,6 +69,15 @@ public class PaymentOptionsActivity extends MainActivity {
                 i.putExtra(Constants.KEY_ORDER_STATUS,Constants.KEY_EDIT_ORDER_VALUE);
                 startActivity(i);
 
+            }
+        });
+        b3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dbHelper.updateOrderStatus(pref.getCurrentOdrerId(), Constants.KEY_DEBIT_CARD_PAYMENT
+                        , Constants.KEY_PAYMENT_STATUS, Constants.ORDER_FINAL_STATUS);
+                Intent i = new Intent(PaymentOptionsActivity.this,MainActivity.class);
+                startActivity(i);
             }
         });
 

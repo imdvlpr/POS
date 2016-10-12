@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.os.StrictMode;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -62,11 +63,12 @@ public class MainActivity extends AppCompatActivity
     public int totalprice;
     public static TextView vTotalconut;
     Intent i;
-    String[] spinnerList;
+    public static ArrayList<String> spinnerList;
     public static ArrayAdapter<String> dataAdapter;
     private static DBHelper dbHelper;
     public String orderId;
     public DrawerLayout drawer;
+    public static String moreQuantity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,13 +81,14 @@ public class MainActivity extends AppCompatActivity
         Resources res = getResources();
         productdata = new Productdata();
         dbHelper = new DBHelper(this);
-        dbHelper.getAllCotacts();
         utility = new Utility(pref,dbHelper);
         listView = (ListView) findViewById(R.id.list);
         // Defined Array values to show in ListView
         orderDetails = new OrderDetails();
         Bundle b = getIntent().getExtras();
         orderDetailsArrayList = new ArrayList<OrderDetails>();
+        final StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         // Define a new Adapter
         // First parameter - Context
@@ -93,11 +96,12 @@ public class MainActivity extends AppCompatActivity
         // Third parameter - ID of the TextView to which the data is written
         // Forth - the Array of data
         vTotalconut = (TextView) findViewById(R.id.totalconut);
-        spinnerList = new String[Constants.QUANTITY_MAX_VALUE];
+        spinnerList = new ArrayList<>();
         for(int a=0;a<Constants.QUANTITY_MAX_VALUE;a++)
         {
-            spinnerList[a]=String.valueOf(a+1);
+            spinnerList.add(String.valueOf(a+1));
         }
+        spinnerList.add("more");
         // Creating adapter for spinner
        dataAdapter = new ArrayAdapter<String>(this, simple_spinner_item, spinnerList);
 
@@ -144,7 +148,7 @@ public class MainActivity extends AppCompatActivity
                                 int count = dbHelper.numberOfOrderDetailsByOrderId(pref.getCurrentOdrerId(),
                                         orderDetails.getItemSku());
                                 if (count>0) {
-                                    int qty = orderDetails.getItemQty()+dbHelper.getQuantityByOrderId(pref.getCurrentOdrerId(),orderDetails.getItemSku());
+                                    Float qty = orderDetails.getItemQty()+dbHelper.getQuantityByOrderId(pref.getCurrentOdrerId(),orderDetails.getItemSku());
                                 dbHelper.updateQuantitybyOidSku(pref.getCurrentOdrerId(),orderDetails.getItemSku(),
                                                     String.valueOf(qty));
                                 }else {
@@ -263,7 +267,7 @@ public class MainActivity extends AppCompatActivity
             // Handle the cart action
             Intent i = new Intent(MainActivity.this,MainActivity.class);
             startActivity(i);
-            
+
         } else if (id == R.id.nav_return) {
 
         } else if (id == R.id.nav_reports) {
@@ -308,7 +312,7 @@ public class MainActivity extends AppCompatActivity
                     productdata = utility.getProductDetailsbySku(scanContent);
                     orderDetails = new OrderDetails();
                     orderDetails.setItemPrice(Float.parseFloat(productdata.getPrice()));
-                    orderDetails.setItemQty(1);
+                    orderDetails.setItemQty((float) 1);
                     orderDetails.setItemSku(scanContent);
                     orderDetails.setsItemName(productdata.getProductName());
                     orderDetailsArrayList.add(orderDetails);
@@ -345,7 +349,6 @@ public class MainActivity extends AppCompatActivity
             DialogueAlertsFragment newFragment = new DialogueAlertsFragment();
             newFragment.show(this.getFragmentManager().beginTransaction(), "Abd");
         }
-
     }
 
     @Override
@@ -356,7 +359,7 @@ public class MainActivity extends AppCompatActivity
             productdata = utility.getProductDetailsbySku(scanContent);
             orderDetails = new OrderDetails();
             orderDetails.setItemPrice(Float.parseFloat(productdata.getPrice()));
-            orderDetails.setItemQty(1);
+            orderDetails.setItemQty((float) 1);
             orderDetails.setItemSku(scanContent);
             orderDetails.setsItemName(productdata.getProductName());
             orderDetailsArrayList.add(orderDetails);
@@ -371,7 +374,7 @@ public class MainActivity extends AppCompatActivity
         if(productdata!=null) {
             orderDetails = new OrderDetails();
             orderDetails.setItemPrice(Float.parseFloat(productdata.getPrice()));
-            orderDetails.setItemQty(1);
+            orderDetails.setItemQty((float) 1);
             orderDetails.setItemSku(productdata.getSku());
             orderDetails.setsItemName(productdata.getProductName());
             orderDetailsArrayList.add(orderDetails);
@@ -379,4 +382,10 @@ public class MainActivity extends AppCompatActivity
             adapter.notifyDataSetChanged();
         }
     }
+
+    @Override
+    public void moreOptionClickAddSpinner(String quantity) {
+
+    }
+
 }

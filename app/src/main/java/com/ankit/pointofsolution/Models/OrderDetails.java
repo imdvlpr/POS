@@ -14,7 +14,7 @@ public class OrderDetails implements Parcelable {
     private String sOrderId;
     private String sItemSku;
     private String sItemName;
-    private int iItemQty;
+    private Float iItemQty;
     private float iItemPrice;
     private String sOrderStatus;
 
@@ -25,7 +25,7 @@ public class OrderDetails implements Parcelable {
         sOrderId = in.readString();
         sItemSku = in.readString();
         sItemName = in.readString();
-        iItemQty = in.readInt();
+        iItemQty = in.readFloat();
         iItemPrice = in.readFloat();
         sOrderStatus = in.readString();
     }
@@ -52,7 +52,7 @@ public class OrderDetails implements Parcelable {
         parcel.writeString(sOrderId);
         parcel.writeString(sItemSku);
         parcel.writeString(sItemName);
-        parcel.writeInt(iItemQty);
+        parcel.writeFloat(iItemQty);
         parcel.writeFloat(iItemPrice);
         parcel.writeString(sOrderStatus);
     }
@@ -78,11 +78,11 @@ public class OrderDetails implements Parcelable {
     public void setsItemName(String sItemName) { this.sItemName = sItemName;}
     public String getsItemName() { return sItemName; }
 
-    public void setItemQty(int iItemQty)
+    public void setItemQty(Float iItemQty)
     {
         this.iItemQty = iItemQty;
     }
-    public int getItemQty() { return iItemQty;  }
+    public Float getItemQty() { return iItemQty;  }
 
     public void setItemPrice(float iItemPrice)
     {

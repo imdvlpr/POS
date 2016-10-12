@@ -23,11 +23,7 @@
         app:menu="@menu/activity_main_drawer" />
 
 
-    <fragment android:name="com.ankit.pointofsolution.dialog_fragments.ItemFragment"
-        android:id="@+id/frame_container"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:layout_height="match_parent" />
+
 
 
 </android.support.v4.widget.DrawerLayout>

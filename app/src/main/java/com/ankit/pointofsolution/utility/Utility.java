@@ -108,14 +108,15 @@ public class Utility {
             oid = pref.getAutoIncreamentId();
         }
         orderid = slast5imei + oid;
-        System.out.println("dbHelper.getOrderStatusByOrderId(orderid):"+dbHelper.getOrderStatusByOrderId(orderid));
-        if(dbHelper.numberOfOrderDetailsByOrderId(orderid)>0 &&
-                dbHelper.getOrderStatusByOrderId(orderid)!=Constants.ORDER_INITIAL_STATUS) {
-                int a= pref.getAutoIncreamentId()+1;
-                pref.setAutoIncreamentId(a);
-                orderid = slast5imei + a;
+        System.out.println("dbHelper.getOrderStatusByOrderId(orderid):"+orderid+":"+dbHelper.getOrderStatusByOrderId(orderid));
+        //dbHelper.numberOfOrderDetailsByOrderId(orderid)>0 &&
+        if(dbHelper.getOrderStatusByOrderId(orderid)!=Constants.ORDER_INITIAL_STATUS)
+        {
+            int a= pref.getAutoIncreamentId()+1;
+            pref.setAutoIncreamentId(a);
+            orderid = slast5imei + a;
             System.out.println("utility orderid:"+orderid);
-            }/*else{
+        }/*else{
                 orderid = null;
             }*/
         return orderid;
@@ -145,6 +146,25 @@ public class Utility {
         }
     }*/
 
+   public void saveItemsindb(String data)
+   {
+       JSONArray jArray = null;
+       try {
+           JSONObject jsonObj = new JSONObject(data);
+           jArray = jsonObj.getJSONArray(Constants.PRODUCTS.toString());
+           for(int i=0;i<jArray.length();i++)
+           {
+               JSONObject json_data = jArray.getJSONObject(i);
+               String productName = json_data.getString("productName");
+               String productPrice= json_data.getString("price");
+               String productBrand= json_data.getString("brand");
+               String productSku= json_data.getString("sku");
+               dbHelper.insertItem(productPrice,productName,productBrand, productSku);
+           }
+       } catch (JSONException e) {
+           e.printStackTrace();
+       }
+   }
 
 
 }

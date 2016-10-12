@@ -56,7 +56,7 @@ public class ListofOrdersActivity extends AppCompatActivity
         listView = (ListView) findViewById(R.id.list);
         ordersArrayList = dbHelper.getAllOrders();
         System.out.println("ordersArrayList:"+ ordersArrayList.size());
-        itemFragment = new ItemFragment();
+
         // Defined Array values to show in ListView
         if(savedInstanceState != null){
             ordersArrayList = savedInstanceState.getParcelableArrayList("d");
