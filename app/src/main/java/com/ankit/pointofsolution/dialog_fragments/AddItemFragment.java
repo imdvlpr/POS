@@ -40,7 +40,7 @@ public class AddItemFragment extends DialogFragment {
         dialog.setContentView(R.layout.fragment_add_item);
         pref = new Preferences(getActivity().getApplicationContext());
         dbHelper = new DBHelper(getActivity().getApplicationContext());
-        //dialog.setTitle("Title...");
+        //dialog.setTitle("Add Item");
         productdata = new Productdata();
         // set the custom dialog components - text, image and button
         eitemPrice = (EditText) dialog.findViewById(R.id.itemPrice);
@@ -78,18 +78,21 @@ public class AddItemFragment extends DialogFragment {
                     cancel = true;
                 }
                 else{ //set data
-                    if(!pref.getProductData().contains(pref.getSkuCode()))
+                    /*if(!pref.getProductData().contains(pref.getSkuCode()))
                     {
                     productdata.setProductName(sitemName);
                     productdata.setPrice(sitemPrice);
                     productdata.setBrand(sitemBrand);
                     productdata.setSku(pref.getSkuCode());
                     Utility utility = new Utility(pref, dbHelper);
-                    if(utility.AdditemCatalog(productdata))response = true;
+                    if(utility.AdditemCatalog(productdata))response = true;*/
+                    dbHelper.insertItem(sitemPrice,sitemName,sitemBrand,pref.getSkuCode(),sadminCode);
+                    Utility utility=new Utility(pref,dbHelper);
+                    productdata=utility.getProductDetailsbySku(pref.getSkuCode());
                     // TODO Auto-generated method stub
                     GetResponseDialogListener activity = (GetResponseDialogListener) getActivity();
-                    activity.updateResult(response);
-                     }
+                    activity.updateResultSkuCode(productdata);
+
                     dialog.hide();
                     dialog.cancel();
                 }

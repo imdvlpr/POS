@@ -64,7 +64,7 @@ public class AddItemManullyFragment extends DialogFragment {
                 else{ //set data
                     Utility utility = new Utility(pref,dbHelper);
                     productdata = utility.getProductDetailsbySku(sitemSkuCode);
-                        if(productdata.getSku()!=null) {
+                        if(productdata!=null) {
                             // TODO Auto-generated method stub
                             GetResponseDialogListener activity = (GetResponseDialogListener) getActivity();
                             activity.updateResultSkuCode(productdata);

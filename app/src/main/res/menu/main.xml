@@ -9,6 +9,12 @@
         android:showAsAction="always"
         />
     <item
+        android:id="@+id/add_coupon"
+        android:title="@string/add_coupon"
+        android:icon="@drawable/add_item"
+        android:showAsAction="always"
+        />
+    <item
         android:id="@+id/scan_button"
         android:orderInCategory="100"
         android:title="@string/scan"

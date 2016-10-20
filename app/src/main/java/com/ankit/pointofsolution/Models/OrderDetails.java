@@ -1,10 +1,9 @@
 package com.ankit.pointofsolution.Models;
 
-import android.app.Activity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Created by Ankit on 08-Sep-16.
@@ -14,9 +13,12 @@ public class OrderDetails implements Parcelable {
     private String sOrderId;
     private String sItemSku;
     private String sItemName;
-    private Float iItemQty;
+    private double iItemQty;
     private float iItemPrice;
     private String sOrderStatus;
+    private String OrderValue;
+    private ArrayList<Coupons> couponsArrayList;
+
 
     public OrderDetails() {
     }
@@ -25,7 +27,7 @@ public class OrderDetails implements Parcelable {
         sOrderId = in.readString();
         sItemSku = in.readString();
         sItemName = in.readString();
-        iItemQty = in.readFloat();
+        iItemQty = in.readDouble();
         iItemPrice = in.readFloat();
         sOrderStatus = in.readString();
     }
@@ -52,7 +54,7 @@ public class OrderDetails implements Parcelable {
         parcel.writeString(sOrderId);
         parcel.writeString(sItemSku);
         parcel.writeString(sItemName);
-        parcel.writeFloat(iItemQty);
+        parcel.writeDouble(iItemQty);
         parcel.writeFloat(iItemPrice);
         parcel.writeString(sOrderStatus);
     }
@@ -78,11 +80,11 @@ public class OrderDetails implements Parcelable {
     public void setsItemName(String sItemName) { this.sItemName = sItemName;}
     public String getsItemName() { return sItemName; }
 
-    public void setItemQty(Float iItemQty)
+    public void setItemQty(double iItemQty)
     {
         this.iItemQty = iItemQty;
     }
-    public Float getItemQty() { return iItemQty;  }
+    public double getItemQty() { return iItemQty;  }
 
     public void setItemPrice(float iItemPrice)
     {
@@ -98,5 +100,21 @@ public class OrderDetails implements Parcelable {
     {
         return sOrderStatus;
     }
+
+    public String getOrderValue() {
+        return OrderValue;
+    }
+
+    public void setOrderValue(String orderValue) {
+        OrderValue = orderValue;
+    }
+    public ArrayList<Coupons> getCouponsArrayList() {
+        return couponsArrayList;
+    }
+
+    public void setCouponsArrayList(ArrayList<Coupons> couponsArrayList) {
+        this.couponsArrayList = couponsArrayList;
+    }
+
 
 }

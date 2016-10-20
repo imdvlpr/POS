@@ -27,8 +27,10 @@ public class SplashActivity extends AppCompatActivity {
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }finally{
-                    if(!preferences.isLoggedin()) {
-//                        System.out.println("preferences.isDeviceVerified() : "+preferences.isDeviceVerified());
+                    System.out.println("preferences:"+ preferences.toString());
+                    boolean login_status = preferences.isLoggedin();
+                    if(!login_status) {
+                        System.out.println("preferences.isDeviceVerified() : "+preferences.isDeviceVerified());
                         if (preferences.isDeviceVerified()) {
                             intent = new Intent(SplashActivity.this, LoginActivity.class);
                         } else {

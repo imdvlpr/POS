@@ -12,26 +12,98 @@
     tools:context="com.ankit.pointofsolution.PaymentOptionsActivity"
     android:orientation="vertical"
     tools:showIn="@layout/app_bar_paymentoptions">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+    <TextView
+        android:id="@+id/itemcount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/album_title"
+        android:textStyle="bold"
+        android:layout_marginStart="8dp"
+        android:gravity="center_vertical|start"
+        />
+    <TextView
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:text="Edit Order list"
-        android:id="@+id/btnEdit"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Items"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/album_title"
+        android:textStyle="bold"
+        android:layout_marginStart="8dp"
+        android:gravity="center_vertical|start"
+        android:layout_weight="1"
+        />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.12">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total ="
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/album_title"
+            android:textStyle="bold"
+            android:textAlignment="viewEnd"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/totalconut"
+            android:hint="1275.00"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/album_title"
+            android:textStyle="bold"
+            android:layout_marginEnd="8dp"
+            android:textAlignment="viewEnd"/>
+    </LinearLayout>
+</LinearLayout>
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:text="Cash"
-        android:id="@+id/btncash"/>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:paddingLeft="64dp"
+        android:paddingRight="64dp">
 
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Edit Order list"
+            android:id="@+id/btnEdit"
+            android:layout_marginTop="60dp"
+            android:background="#00a65a"
+            android:textColor="#FFFFFF"
+            />
 
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Cash"
+            android:id="@+id/btncash"
+            android:background="#00a65a"
+            android:textColor="#ffffff"
+            android:layout_below="@+id/button2"
+            android:layout_alignStart="@+id/button2"
+            android:layout_centerHorizontal="true"
+            />
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:text="DebitCard"
-        android:id="@+id/btndc"/>
-
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="DebitCard"
+            android:id="@+id/btndc"
+            android:layout_below="@+id/button3"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:textColor="#FFFFFF"
+            android:background="#00a65a"
+            />
+    </LinearLayout>
 
 </LinearLayout>

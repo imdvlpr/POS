@@ -1,16 +1,17 @@
 package com.ankit.pointofsolution.config;
 
-import android.app.Activity;
-import android.os.AsyncTask;
-
-
 public class Constants {
 
 	public static final String APP_NAME = "PointofSales";
 	public static final boolean DEBUG = false;
-
+	//jsons objects
 	public static final String USERS = "users";
 	public static final String PRODUCTS = "products";
+	public static final String POS_TOKEN = "posToken";
+	public static final String API_STATUS = "status";
+	public static final String API_MESSAGE = "message";
+	public static final String sIMEI = "123456789098765";
+
 
 	public static final String CRASH_REPORT_EMAIL_ID = "ankitjain@ssism.org";
 	public static final boolean DELETE_FILES_AFTER_UPLOAD = true; 
@@ -30,6 +31,7 @@ public class Constants {
 
 	public static final String ADD_ITEM_TYPE_1 = "ADD_ITEM_MANULLY";
 	public static final String ADD_ITEM_TYPE_2 = "ADD_IN_CATALOG";
+	public static final String ADD_COUPONS = "ADD_COUPONS";
 
 	public static final String ORDER_STORAGE_STATUS = "NOT_SYNCED";
 	public static final String ORDER_INITIAL_STATUS = "IN_PROGRESS";

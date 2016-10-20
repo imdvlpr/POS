@@ -2,11 +2,7 @@ package com.ankit.pointofsolution.modules;
 
 import android.content.Intent;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -16,16 +12,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import com.ankit.pointofsolution.Models.OrderDetails;
+import com.ankit.pointofsolution.MainActivity;
 import com.ankit.pointofsolution.Models.Orders;
 import com.ankit.pointofsolution.R;
-import com.ankit.pointofsolution.adapter.CustomAdapter;
 import com.ankit.pointofsolution.adapter.OrdersAdapter;
 import com.ankit.pointofsolution.api.ApiManager;
-import com.ankit.pointofsolution.dialog_fragments.ItemFragment;
+import com.ankit.pointofsolution.config.Messages;
 import com.ankit.pointofsolution.storage.DBHelper;
 import com.ankit.pointofsolution.storage.Preferences;
+import com.ankit.pointofsolution.utility.SyncAdapter;
 
 import java.util.ArrayList;
 
@@ -40,7 +37,7 @@ public class ListofOrdersActivity extends AppCompatActivity
     private ListView listView;
     private ArrayList<Orders> ordersArrayList;
     private OrdersAdapter ordersAdapter;
-    public static ItemFragment itemFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,14 +126,28 @@ public class ListofOrdersActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_cart) {
-            // Handle the camera action
+            // Handle the cart action
+            Intent i = new Intent(ListofOrdersActivity.this,MainActivity.class);
+            startActivity(i);
+
         } else if (id == R.id.nav_return) {
 
         } else if (id == R.id.nav_reports) {
-            Intent i = new Intent(this, ListofOrdersActivity.class);
-            startActivity(i);
+
+            //working code checks weather orders exist .....
+            if(dbHelper.getAllOrders().size()>0) {
+                Intent i = new Intent(this, ListofOrdersActivity.class);
+                startActivity(i);
+            }else
+            {
+                Toast.makeText(this, Messages.EMPTY_ORDERS,Toast.LENGTH_LONG).show();
+            }
 
         } else if (id == R.id.nav_reciept) {
+
+        }else if (id == R.id.nav_customer) {
+            Intent i = new Intent(this, CustomerActivity.class);
+            startActivity(i);
 
         } else if (id == R.id.nav_tools) {
 
@@ -145,7 +156,9 @@ public class ListofOrdersActivity extends AppCompatActivity
         } else if (id == R.id.nav_logout) {
             apiManager.logout(pref);
         } else if (id == R.id.nav_help) {
-
+        }
+        else if (id == R.id.sync) {
+            new SyncAdapter(this).execute();
         }
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

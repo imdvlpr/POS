@@ -7,7 +7,6 @@ import com.ankit.pointofsolution.Models.Productdata;
  */
 public interface GetResponseDialogListener {
 
-    void updateResult(boolean response);
+    //void updateResult(boolean response);
     void updateResultSkuCode(Productdata response);
-    void moreOptionClickAddSpinner(String quantity);
 }

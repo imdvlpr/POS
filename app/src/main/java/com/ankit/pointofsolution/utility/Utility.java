@@ -1,25 +1,17 @@
 package com.ankit.pointofsolution.utility;
 
-import android.content.Context;
-import android.telephony.TelephonyManager;
-
-import com.ankit.pointofsolution.Models.OrderDetails;
 import com.ankit.pointofsolution.Models.Productdata;
 import com.ankit.pointofsolution.config.Constants;
-import com.ankit.pointofsolution.dialog_fragments.AddItemManullyFragment;
-import com.ankit.pointofsolution.dialog_fragments.DialogueAlertsFragment;
 import com.ankit.pointofsolution.storage.DBHelper;
 import com.ankit.pointofsolution.storage.Preferences;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Ankit on 08-Sep-16.
@@ -33,6 +25,9 @@ public class Utility {
     public Utility(Preferences pref, DBHelper dbHelper){
         this.pref = pref;
         this.dbHelper = dbHelper;
+    }
+
+    public Utility() {
     }
 
     public boolean AdditemCatalog(Productdata productdata)
@@ -73,7 +68,7 @@ public class Utility {
 
     public Productdata getProductDetailsbySku(String skucode)
     {
-        Productdata productdata = new Productdata();
+        /*Productdata productdata = new Productdata();
         try {
             JSONArray jsonArray = new JSONArray(pref.getProductData());
             for(int i=0; i<jsonArray.length();i++)
@@ -90,7 +85,8 @@ public class Utility {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
+        Productdata productdata = dbHelper.getItemBySkuCode(skucode);
     return productdata;
     }
 
@@ -108,17 +104,16 @@ public class Utility {
             oid = pref.getAutoIncreamentId();
         }
         orderid = slast5imei + oid;
-        System.out.println("dbHelper.getOrderStatusByOrderId(orderid):"+orderid+":"+dbHelper.getOrderStatusByOrderId(orderid));
+        //System.out.println("dbHelper.getOrderStatusByOrderId(orderid):"+orderid+":"+dbHelper.getOrderStatusByOrderId(orderid));
         //dbHelper.numberOfOrderDetailsByOrderId(orderid)>0 &&
-        if(dbHelper.getOrderStatusByOrderId(orderid)!=Constants.ORDER_INITIAL_STATUS)
+        if(!dbHelper.getOrderStatusByOrderId(orderid).equals("false")
+                && !dbHelper.getOrderStatusByOrderId(orderid).equals(Constants.ORDER_INITIAL_STATUS))
         {
-            int a= pref.getAutoIncreamentId()+1;
+            int a = pref.getAutoIncreamentId()+1;
             pref.setAutoIncreamentId(a);
             orderid = slast5imei + a;
-            System.out.println("utility orderid:"+orderid);
-        }/*else{
-                orderid = null;
-            }*/
+            //System.out.println("utility orderid:"+orderid);
+        }
         return orderid;
     }
 
@@ -151,7 +146,8 @@ public class Utility {
        JSONArray jArray = null;
        try {
            JSONObject jsonObj = new JSONObject(data);
-           jArray = jsonObj.getJSONArray(Constants.PRODUCTS.toString());
+           jArray = jsonObj.getJSONArray(Constants.PRODUCTS);
+
            for(int i=0;i<jArray.length();i++)
            {
                JSONObject json_data = jArray.getJSONObject(i);
@@ -159,12 +155,43 @@ public class Utility {
                String productPrice= json_data.getString("price");
                String productBrand= json_data.getString("brand");
                String productSku= json_data.getString("sku");
-               dbHelper.insertItem(productPrice,productName,productBrand, productSku);
+               Productdata productdata = dbHelper.getItemBySkuCode(productSku);
+               if(productdata!=null && productdata.getSku().equals(productSku)) {
+                   dbHelper.updateItem(productPrice,productName,productBrand,productSku);
+               }
+               else
+               {
+                   dbHelper.insertItem(productPrice, productName, productBrand, productSku, "");
+               }
+               //dbHelper.insertItem(productPrice,productName,productBrand, productSku, "");
            }
        } catch (JSONException e) {
            e.printStackTrace();
        }
    }
+    public void saveUsersindb(String data)
+    {
+        JSONArray jArray = null;
+        try {
+            JSONObject jsonObj = new JSONObject(data);
+            jArray = jsonObj.getJSONArray(Constants.USERS);
+            for(int i=0;i<jArray.length();i++)
+            {
+                JSONObject json_data = jArray.getJSONObject(i);
+                String userName = json_data.getString("userId");
+                String userEncryptedPassword= json_data.getString("encryptedPassword");
+                String userRole= json_data.getString("role");
+                dbHelper.insertUser(userName,userEncryptedPassword,userRole);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    public Productdata getProductDetailsbyCouponsItemSku(String skucode)
+    {
+        Productdata productdata = dbHelper.getItemByCouponsItemSkuCode(skucode);
+        return productdata;
+    }
 
 
 }

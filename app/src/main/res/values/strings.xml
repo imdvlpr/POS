@@ -35,6 +35,8 @@
     <string name="dialog_Remove_items_od">Do you want to remove this Item?</string>
     <string name="add_item">Add Item</string>
     <string name="add_item_manully">Enter Sku Code</string>
+    <string name="add_Coupons_manully">Enter Coupons Sku Code</string>
+    <string name="add_coupon">Add Coupons</string>
     <string name="add">Add</string>
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
@@ -62,4 +64,8 @@
     <string name="customer_street">Street</string>
     <string name="customer_place">Place</string>
     <string name="customer_phone">Phone</string>
+    <string name="title_item_list">Items</string>
+    <string name="title_item_detail">Item Detail</string>
+    <string name="title_activity_orders_details">OrdersDetailsActivity</string>
+    <string name="title_activity_payment_confirmation">PaymentConfirmation</string>
 </resources>

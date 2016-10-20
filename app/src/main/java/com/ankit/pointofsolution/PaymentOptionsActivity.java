@@ -1,37 +1,21 @@
 package com.ankit.pointofsolution;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
-import com.ankit.pointofsolution.IntentIntegrator.IntentIntegrator;
-import com.ankit.pointofsolution.Models.OrderDetails;
 import com.ankit.pointofsolution.api.ApiManager;
 import com.ankit.pointofsolution.config.Constants;
 import com.ankit.pointofsolution.storage.DBHelper;
 import com.ankit.pointofsolution.storage.Preferences;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 public class PaymentOptionsActivity extends MainActivity {
 
@@ -58,7 +42,7 @@ public class PaymentOptionsActivity extends MainActivity {
             public void onClick(View view) {
                 dbHelper.updateOrderStatus(pref.getCurrentOdrerId(), Constants.KEY_CASH_PAYMENT
                 , Constants.KEY_PAYMENT_STATUS, Constants.ORDER_FINAL_STATUS);
-                Intent i = new Intent(PaymentOptionsActivity.this,MainActivity.class);
+                Intent i = new Intent(PaymentOptionsActivity.this,PaymentConfirmation.class);
                 startActivity(i);
             }
         });

@@ -1,8 +1,8 @@
 package com.ankit.pointofsolution.adapter;
 
 import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,9 +11,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.ankit.pointofsolution.Models.Orders;
 import com.ankit.pointofsolution.R;
-import com.ankit.pointofsolution.modules.ListofOrdersActivity;
+import com.ankit.pointofsolution.modules.OrdersDetailsActivity;
 
 import java.util.ArrayList;
 
@@ -118,11 +119,12 @@ public class OrdersAdapter extends BaseAdapter implements View.OnClickListener{
 
         @Override
         public void onClick(final View v) {
-            System.out.println("ye yaha to he :"+ mPosition);
-/*
-            FragmentTransaction fragTransaction = activity.getFragmentManager().beginTransaction();
-            fragTransaction.replace(R.id.frame_container, ListofOrdersActivity.itemFragment).addToBackStack(null);
-            fragTransaction.show(ListofOrdersActivity.itemFragment);*/
+            //System.out.println("ye yaha to he :"+ mPosition);
+            Intent i = new Intent(activity, OrdersDetailsActivity.class);
+            i.putExtra("orderID", data.get(mPosition).getOrderId());
+            activity.startActivity(i);
+            //activity.finish();
+
         }
     }
 

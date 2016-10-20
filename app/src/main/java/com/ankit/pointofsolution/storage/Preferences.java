@@ -7,11 +7,8 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceActivity;
 import android.telephony.TelephonyManager;
 
-
 import com.ankit.pointofsolution.config.Constants;
-import com.google.gson.Gson;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,7 +28,6 @@ public class Preferences {
 	private Context context = null;
 	private SharedPreferences prefsPrivate;
 	public static final String PREFS_PRIVATE = Constants.APP_NAME+ "_PREFS_PRIVATE";
-	Gson gson = new Gson();
 
 	public static final String KEY_IS_DEVICE_VERIFIED = "IS_DEVICE_VERIFIED";
 	public static final String KEY_ORDER_DETAILS = "ORDER_DETAILS";
@@ -49,12 +45,16 @@ public class Preferences {
 	public static final String KEY_ADMIN_CODE ="ADMIN_CODE";
 	public static final String KEY_AUTO_INCREAMENT_ID = "AUTO_INCREAMENT_ID";
 	public static final String KEY_CURRENT_ORDER_ID = "CURRENT_ORDER_ID";
+	public static final String KEY_POS_TOKEN = "POS_TOKEN";
+
 
 
 	public Preferences(Activity thisActivity) {
 		activity = thisActivity;
 		prefsPrivate = activity.getSharedPreferences(PREFS_PRIVATE,
 				MODE_PRIVATE);
+		SharedPreferences.Editor editor = prefsPrivate.edit();
+		editor.commit();
 	}
 
 	public Preferences(PreferenceActivity thisActivity) {
@@ -326,5 +326,13 @@ public class Preferences {
 		String sIMEI = telephonyManager.getDeviceId();
 		return sIMEI;
 	}
+
+	public void setPosToken(String sPosToken) {
+		putValue(KEY_POS_TOKEN, sPosToken);
+	}
+	public String getPosToken() {
+		return getValue(KEY_POS_TOKEN, "");
+	}
+
 
 }

@@ -9,6 +9,7 @@
     tools:openDrawer="start"
     tools:context="com.ankit.pointofsolution.PaymentOptionsActivity">
 
+
     <include
         layout="@layout/app_bar_paymentoptions"
         android:layout_width="match_parent"

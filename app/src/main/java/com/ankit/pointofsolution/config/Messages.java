@@ -24,12 +24,18 @@ public class Messages {
 	public static final String INVALID_USERNAME_PWD = "Invalid username/password or inactive user!";
 	//public static final String ACCESS_DENIED = "Access denied";
 	public static final String ACCESS_DENIED = "Incorrect verification code. Please contact admin!";
-
 	// Alerts
 	public static final String MSG_INVALID_USER = "You are an inactive user!";
 	public static final String NO_ITEMS_IN_CART = "Cart is empty. please add items in cart.";
 	public static final String CHECK_CART = "Please check your previous order.";
 	public static final String EMPTY_ORDERS = "Orders not placed yet!";
+	public static final String INVALID_COUPON = "Invalid Coupon!";
+	public static final String EXPIRE_COUPON = "Coupon Expired!";
+
+	//Sync messages
+	public static final String SYNC_SUCCESS = "Synced successfully!";
+
+
 
 
 	public static String getEmptyText(String str) {

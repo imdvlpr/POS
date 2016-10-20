@@ -13,10 +13,6 @@ import com.ankit.pointofsolution.R;
 import com.ankit.pointofsolution.config.Messages;
 import com.ankit.pointofsolution.storage.DBHelper;
 import com.ankit.pointofsolution.storage.Preferences;
-import com.ankit.pointofsolution.utility.L;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Ankit on 19-Sep-16.
@@ -42,24 +38,26 @@ public class RemoveItemODFragment extends DialogFragment {
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Call Add item fragment to add new product in product catalog
-                        float totalprice = 0;
+                        double totalprice = 0;
                         for(int i=0;i<MainActivity.orderDetailsArrayList.size();i++)
                         {
                             totalprice = (MainActivity.orderDetailsArrayList.get(i).getItemQty() *
                                     MainActivity.orderDetailsArrayList.get(i).getItemPrice())+totalprice;
                         }
                          dbHelper.deleteOrderDetails(pref.getCurrentOdrerId(),
-                                MainActivity.orderDetailsArrayList.get(mPosition).getItemSku());
-
-                        MainActivity.vTotalconut.setText(String.valueOf(totalprice));
+                        MainActivity.orderDetailsArrayList.get(mPosition).getItemSku());
                         MainActivity.orderDetailsArrayList.remove(mPosition);
+                        MainActivity.vTotalconut.setText(String.valueOf(totalprice));
+                        MainActivity.itemCount.setText(String.valueOf(MainActivity.orderDetailsArrayList.size()));
+
                        //update adapter using notify function
-                        MainActivity.adapter.notifyDataSetChanged();
+                        MainActivity.listViewAdpter.notifyDataSetChanged();
                         //Check the size of list if there is no item then set invisible list also
                         // set a msg to populate that there is no items in list.
                         if(MainActivity.orderDetailsArrayList.size()<=0)
                         {
                             MainActivity.listView.setVisibility(View.INVISIBLE);
+                            MainActivity.vTotalconut.setText("");
                             Toast.makeText(getActivity(), Messages.NO_ITEMS_IN_CART,Toast.LENGTH_LONG).show();
                         }
                     }

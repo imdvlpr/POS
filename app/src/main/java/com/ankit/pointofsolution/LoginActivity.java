@@ -32,6 +32,7 @@ import android.widget.TextView;
 
 import com.ankit.pointofsolution.Models.Userdata;
 import com.ankit.pointofsolution.config.Messages;
+import com.ankit.pointofsolution.storage.DBHelper;
 import com.ankit.pointofsolution.storage.Preferences;
 import com.ankit.pointofsolution.utility.Password;
 import com.google.gson.Gson;
@@ -75,13 +76,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
     Preferences pref;
-    List<Userdata> userdataList;
 
     private String check;
     boolean cancel = false;
     View focusView = null;
-    private JSONObject jsonObj;
-
+    DBHelper dbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,12 +90,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
         pref = new Preferences(this);
-
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setDateFormat("M/d/yy hh:mm a");
-        Gson gson = gsonBuilder.create();
-        userdataList = Arrays.asList(gson.fromJson(pref.getUserData(), Userdata[].class));
-
+        dbHelper = new DBHelper(this);
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -342,7 +336,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 return false;
             }
 
-            ArrayList<String> userIdList = new ArrayList<>();
+            /*ArrayList<String> userIdList = new ArrayList<>();
             ArrayList<String> passwordList = new ArrayList<>();
             int i;
             for(i=0;i<userdataList.size();i++) {
@@ -352,10 +346,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     System.out.println("userdata :" + i + ":" + userIdList.toString() + ":" + passwordList.toString());
                     break;
                 }
-            }
-            if(userIdList.contains(mEmail))
+            }*/
+            String dbPassword= dbHelper.checkUserEmail(mEmail);
+            if(dbPassword!=null)
             {
-                if(Password.checkPassword(mPassword,passwordList.get(0)))
+                if(Password.checkPassword(mPassword,dbPassword))
                 { check="success";}
                 else  {  check="wrongpassword";  }
             }
