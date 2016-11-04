@@ -7,6 +7,7 @@ import java.io.Writer;
 public class Messages {
 
 	public static final String ERROR_PRECEDE = "Error - ";
+	public static final String IS_SERVER_ALIVE = "Please wait for a moment, Checking weather server is active or not.";
 	public static final String NO_INTERNET = "Unable to process. Internet connection unavailable. ";
 	public static final String NO_API = "Unable to process. Server API connection problem occured.";
 	public static final String CONN_TIMEDOUT = "Connection timeout.";
@@ -17,7 +18,8 @@ public class Messages {
 	public static final String PLZ_WAIT_UPLOADING = "Please wait while uploading...";
 	public static final String PLZ_WAIT_DOWNLOADING = "Please wait while downloading...";
 	public static final String ERROR_GENERAL = "Error occured while processing.";
-
+	public static final String UNAUTHORIZED_ACCESS = "Unauthorized: Access is denied due to invalid credentials\"";
+	public static final String DEVICE_DEACTIVE = "Device deactived. Please contact admin!";
 
 	public static final String ENTER_VERIFICATION_CODE = "Verification Code cannot be empty";
 
@@ -31,6 +33,10 @@ public class Messages {
 	public static final String EMPTY_ORDERS = "Orders not placed yet!";
 	public static final String INVALID_COUPON = "Invalid Coupon!";
 	public static final String EXPIRE_COUPON = "Coupon Expired!";
+	public static final String REPLACE_COUPON = "One coupon is already exist. Do you want to replace coupon?";
+	public static final String EXIST_COUPON = "Replace Coupon";
+	public static final String MAIL_SUBJECT = "Thanks for order";
+
 
 	//Sync messages
 	public static final String SYNC_SUCCESS = "Synced successfully!";

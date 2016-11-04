@@ -12,9 +12,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.ankit.pointofsolution.Models.Coupons;
+import com.ankit.pointofsolution.Models.Customers;
 import com.ankit.pointofsolution.Models.OrderDetails;
 import com.ankit.pointofsolution.Models.Orders;
 import com.ankit.pointofsolution.Models.Productdata;
+import com.ankit.pointofsolution.Models.Userdata;
+import com.ankit.pointofsolution.config.Constants;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,11 +30,15 @@ public class DBHelper extends SQLiteOpenHelper {
     //Contact Constants
     public static final String CUSTOMER_TABLE_NAME = "customer";
     public static final String CUSTOMER_COLUMN_ID = "id";
+    public static final String CUSTOMER_COLUMN_CUSTOMERID = "customerId";
     public static final String CUSTOMER_COLUMN_NAME = "name";
     public static final String CUSTOMER_COLUMN_EMAIL = "email";
     public static final String CUSTOMER_COLUMN_STREET = "street";
     public static final String CUSTOMER_COLUMN_CITY = "place";
     public static final String CUSTOMER_COLUMN_PHONE = "phone";
+    public static final String CUSTOMER_COLUMN_STORAGESTATUS = "storageStatus";
+    public static final String CUSTOMER_COLUMN_CUSTOMERSTATUS = "status";
+
 
     //Orders Constants
     public static final String ORDERS_TABLE_NAME = "orders";
@@ -45,6 +52,11 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String ORDERS_COLUMN_ORDERUPDATEDAT = "orderUpdatedAt";
     public static final String ORDERS_COLUMN_PAYMENTTYPE = "orderPaymentType";
     public static final String ORDERS_COLUMN_PAYMENTSTATUS = "orderPaymentStatus";
+    public static final String ORDERS_COLUMN_PAYMENTPRICE = "orderPaymentPrice";
+    public static final String ORDERS_COLUMN_CUSTOMERID = "orderCustomerId";
+    public static final String ORDERS_COLUMN_ORDERCREATEDBY = "orderCreatedBy";
+
+
 
     //Orders Constants
     public static final String OD_TABLE_NAME = "order_details";
@@ -55,6 +67,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String OD_COLUMN_PRODUCTQTY = "productQty";
     public static final String OD_COLUMN_PRODUCTPRICE = "productPrice";
     public static final String OD_COLUMN_PRODUCTNAME = "productName";
+    public static final String OD_COLUMN_CCODE = "procductCcode";
+    public static final String OD_COLUMN_CVALUE = "procductCvalue";
 
     //Item Constants
 
@@ -68,6 +82,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static final String USER_TABLE_NAME = "users";
     public static final String USER_COLUMN_PASSWORD = "userEncryptedPassword";
+    public static final String USER_COLUMN_ID = "userId";
+    public static final String USER_COLUMN_STATUS = "userStatus";
+    public static final String USER_COLUMN_NAME = "userName";
+    public static final String USER_COLUMN_ROLE = "userRole";
 
 
     //Coupon Constants
@@ -80,9 +98,11 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String CP_END_DATE = "cpEndDate";
     public static final String CP_STATUS = "cpStatus";
     private HashMap hp;
+    private Preferences pref;
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
+        pref = new Preferences(context);
     }
 
     @Override
@@ -90,13 +110,14 @@ public class DBHelper extends SQLiteOpenHelper {
         // TODO Auto-generated method stub
         //Create contact query
         String customer_qry = "create table "+CUSTOMER_TABLE_NAME+" " +
-                "(id integer primary key, name text,phone text,email text, street text,place text)";
+                "(id integer primary key,customerId text, name text,phone text,email text, street text,place text,"+CUSTOMER_COLUMN_STORAGESTATUS+" text," +
+                "createdAt text, status text default 'active')";
         db.execSQL(customer_qry);
         //Create orders query
         String orders_qry = "create table " +ORDERS_TABLE_NAME+
                 "(oId integer primary key, orderId text, orderStatus text,orderStorageStatus text,orderOffers text," +
-                 "orderPromotions text, orderPaymentType text, orderPaymentStatus text, orderCreatedAt text, " +
-                 "orderUpdatedAt text )";
+                 "orderPromotions text, orderPaymentType text, orderPaymentPrice text,orderCustomerId text, orderPaymentStatus text" +
+                ",orderCreatedBy text, orderCreatedAt text, orderUpdatedAt text )";
 //        System.out.println("onCreate: orders_qry: "+ orders_qry);
         db.execSQL(orders_qry);
         //Create order details query
@@ -127,10 +148,10 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(coupon_qry);
         //Insert Coupons details query
         String coupon_insert_qry = "INSERT INTO coupons (cpItemSkuCode,cpCouponSkuCode,cpValue,cpStartDate,cpEndDate) " +
-                "VALUES ('ASAP1','1234','1','2016-10-13 01.20.20','2016-10-21 02.30.30'),('ASAP2','12345','46','2016-10-13 01.20.20'" +
-                                                        ",'2016-10-15 02.30.30')";
+                "VALUES ('ASAP1','1234','1','2016-10-20 01.20.20','2016-11-01 23.30.30')" +
+                     ",('ASAP1','123456','1','2016-10-20 01.20.20','2016-11-21 23.30.30')" +
+                     ",('ASAP2','12345','46','2016-10-20 01.20.20','2016-11-15 02.30.30')";
         db.execSQL(coupon_insert_qry);
-
     }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -139,15 +160,18 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
     // Operations for contact tables
-    public boolean insertContact(String name, String phone, String email, String street,String place)
+    public boolean insertCustomer(String name, String email, String phone, String street,String place)
     {
+        String CreatedAt = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(new Date());
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("name", name);
-        contentValues.put("phone", phone);
         contentValues.put("email", email);
+        contentValues.put("phone", phone);
         contentValues.put("street", street);
         contentValues.put("place", place);
+        contentValues.put("storageStatus", Constants.STORAGE_STATUS);
+        contentValues.put("createdAt", CreatedAt);
         db.insert(CUSTOMER_TABLE_NAME, null, contentValues);
         return true;
     }
@@ -185,7 +209,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 new String[] { Integer.toString(id) });
     }
 
-    public ArrayList<String> getAllCotacts()
+    public ArrayList<String> getAllContacts()
     {
         ArrayList<String> array_list = new ArrayList<String>();
 
@@ -203,10 +227,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     // order table operations
     public boolean insertOrders(String orderId, String orderStatus, String orderStorageStatus, String orderOffers,
-                                                     String orderPromotions)
+                                                     String orderPromotions, String orderCustomersId)
     {
         String orderCreatedAt = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(new Date());
-
+        String orderCreatedBy = pref.getUsername();
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(ORDERS_COLUMN_ORDERID, orderId);
@@ -214,14 +238,18 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(ORDERS_COLUMN_ORDERSTORAGESTATUS, orderStorageStatus);
         contentValues.put(ORDERS_COLUMN_ORDEROFFERS, orderOffers);
         contentValues.put(ORDERS_COLUMN_ORDERPROMOTIONS, orderPromotions);
-        contentValues.put(ORDERS_COLUMN_ORDERCREATEDAT, orderCreatedAt);
+        contentValues.put(ORDERS_COLUMN_CUSTOMERID, orderCustomersId);
         contentValues.put(ORDERS_COLUMN_ORDERUPDATEDAT, orderCreatedAt);
+        contentValues.put(ORDERS_COLUMN_ORDERCREATEDAT, orderCreatedAt);
+        contentValues.put(ORDERS_COLUMN_ORDERCREATEDBY, orderCreatedBy);
         db.insert(ORDERS_TABLE_NAME, null, contentValues);
         return true;
     }
     public ArrayList<Orders> getAllOrders(){
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from "+ORDERS_TABLE_NAME+" ", null );
+        Cursor res =  db.rawQuery( "select * from "+ORDERS_TABLE_NAME+"" +
+                "  where "+ORDERS_COLUMN_ORDERSTATUS+"='"+ Constants.ORDER_FINAL_STATUS+"' AND "+
+                 ORDERS_COLUMN_ORDERSTORAGESTATUS+"='"+ Constants.STORAGE_STATUS+"'", null );
         ArrayList<Orders> ordersArrayList = new ArrayList<>();
 //        System.out.println("count:"+res.getCount());
         if (res.moveToFirst()) {
@@ -232,8 +260,14 @@ public class DBHelper extends SQLiteOpenHelper {
                 orders.setOrderOffers(res.getString(res.getColumnIndex(ORDERS_COLUMN_ORDEROFFERS)));
                 orders.setOrderPromotions(res.getString(res.getColumnIndex(ORDERS_COLUMN_ORDERPROMOTIONS)));
                 orders.setOrderStorageStatus(res.getString(res.getColumnIndex(ORDERS_COLUMN_ORDERSTORAGESTATUS)));
+                orders.setOrderPaymentType(res.getString(res.getColumnIndex(ORDERS_COLUMN_PAYMENTTYPE)));
+                orders.setOrderPaymentPrice(res.getString(res.getColumnIndex(ORDERS_COLUMN_PAYMENTPRICE)));
+                orders.setOrderPaymentStatus(res.getString(res.getColumnIndex(ORDERS_COLUMN_PAYMENTSTATUS)));
                 orders.setOrderCreatedAt(res.getString(res.getColumnIndex(ORDERS_COLUMN_ORDERCREATEDAT)));
                 orders.setOrderUpdatedAt(res.getString(res.getColumnIndex(ORDERS_COLUMN_ORDERUPDATEDAT)));
+                orders.setOrderCustomerId(res.getString(res.getColumnIndex(ORDERS_COLUMN_CUSTOMERID)));
+                orders.setOrderCreatedBy(res.getString(res.getColumnIndex(ORDERS_COLUMN_ORDERCREATEDBY)));
+
                 ordersArrayList.add(orders);
             } while (res.moveToNext());
         }
@@ -263,13 +297,31 @@ public class DBHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public boolean updateOrderStatus(String orderId, String paymentType, String paymentStatus, String orderStatus)
+    public boolean updateOrderStorageStatus()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ORDERS_COLUMN_ORDERSTORAGESTATUS, Constants.STORAGE_STATUS1);
+        db.update(ORDERS_TABLE_NAME, contentValues, ORDERS_COLUMN_ORDERSTATUS+" = ? ", new String[] { Constants.ORDER_FINAL_STATUS } );
+        return true;
+    }
+    public boolean updateCustomerStorageStatus()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(CUSTOMER_COLUMN_STORAGESTATUS, Constants.STORAGE_STATUS1);
+        db.update(CUSTOMER_TABLE_NAME, contentValues, null, null );
+        return true;
+    }
+    public boolean updateOrderStatus(String orderId, String paymentType,
+                                     String paymentStatus, String orderStatus,String price)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(ORDERS_COLUMN_ORDERSTATUS, orderStatus);
         contentValues.put(ORDERS_COLUMN_PAYMENTTYPE, paymentType);
         contentValues.put(ORDERS_COLUMN_PAYMENTSTATUS, paymentStatus);
+        contentValues.put(ORDERS_COLUMN_PAYMENTPRICE, price);
         db.update(ORDERS_TABLE_NAME, contentValues, "orderId = ? ", new String[] { orderId } );
         return true;
     }
@@ -294,9 +346,9 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         return array_list;
     }
-
     // order details table operations
-    public boolean insertOrderDetails(String orderId, String productSku, String productQty, String productPrice, String productName)
+    public boolean insertOrderDetails(String orderId, String productSku, String productQty, String productPrice, String productName,
+                                                  String procductCcode, String procductCvalue)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -305,6 +357,8 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(OD_COLUMN_PRODUCTQTY, productQty);
         contentValues.put(OD_COLUMN_PRODUCTPRICE, productPrice);
         contentValues.put(OD_COLUMN_PRODUCTNAME, productName);
+        contentValues.put(OD_COLUMN_CCODE, procductCcode);
+        contentValues.put(OD_COLUMN_CVALUE, procductCvalue);
         db.insert(OD_TABLE_NAME, null, contentValues);
         return true;
     }
@@ -312,6 +366,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "select * from "+OD_TABLE_NAME+" where orderId='"+orderId+"'", null );
         ArrayList<OrderDetails> orderDetailsArrayList = new ArrayList<>();
+
         if (res.moveToFirst()) {
             do {
                 OrderDetails orderDetails = new OrderDetails();
@@ -319,11 +374,25 @@ public class DBHelper extends SQLiteOpenHelper {
                 orderDetails.setItemPrice(Float.parseFloat(res.getString(res.getColumnIndex(OD_COLUMN_PRODUCTPRICE))));
                 orderDetails.setItemQty(Float.parseFloat(res.getString(res.getColumnIndex(OD_COLUMN_PRODUCTQTY))));
                 orderDetails.setsItemName(res.getString(res.getColumnIndex(OD_COLUMN_PRODUCTNAME)));
+                String cCode = res.getString(res.getColumnIndex(OD_COLUMN_CCODE));
+                String cValue = res.getString(res.getColumnIndex(OD_COLUMN_CVALUE));
+                //System.out.println("jgsajfdgsay"+ cCode+"----"+cValue);
+                if(cCode!=null && cValue!=null) {
+                    Coupons c = new Coupons();
+                    c.setCpCouponSkuCode(res.getString(res.getColumnIndex(OD_COLUMN_CCODE)));
+                    c.setCpItemSkuCode(res.getString(res.getColumnIndex(OD_COLUMN_PRODUCTSKU)));
+                    c.setCpValue(res.getString(res.getColumnIndex(OD_COLUMN_CVALUE)));
+                    //orderDetails.setCoupons(c);
+                    ArrayList<Coupons> cuoponArrayList = new ArrayList<>();
+                    cuoponArrayList.add(c);
+                    orderDetails.setCouponsArrayList(cuoponArrayList);
+                }
                 orderDetailsArrayList.add(orderDetails);
             } while (res.moveToNext());
         }
         return orderDetailsArrayList;
     }
+
     public String getOrderStatusByOrderId(String orderId){
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "select * from "+ORDERS_TABLE_NAME+" where orderId='"+orderId+"'", null );
@@ -406,7 +475,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public boolean insertItem(String itemPrice,String itemName,String brand,String SkuCode, String sAdminCode)
     {
         String itemCreatedAt = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(new Date());
-        //System.out.println("insertItem: " + itemPrice + ", " + itemName + " , " + SkuCode);
+        System.out.println("insertItem: " + itemPrice + ", " + itemName + " , " + SkuCode);
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("itemPrice", itemPrice);
@@ -438,7 +507,8 @@ public class DBHelper extends SQLiteOpenHelper {
     {
         String passWord=null;
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from "+USER_TABLE_NAME+" where userName='"+mEmail+"'", null);
+        Cursor res =  db.rawQuery( "select * from "+USER_TABLE_NAME+" where userName='"+mEmail+"' and "
+                        +USER_COLUMN_STATUS+"='active'", null);
         //System.out.println("res: "+res.getCount());
         if (res.moveToFirst()) {
             do {
@@ -447,6 +517,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         return passWord;
     }
+
 
     public Productdata getItemBySkuCode(String skuCode){
         SQLiteDatabase db = this.getReadableDatabase();
@@ -472,6 +543,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor res =  db.rawQuery("select * from "+CP_TABLE_NAME+" where cpCouponSkuCode='"+Couponcode+"'", null);
         if (res.moveToFirst()) {
             do{
+                coupons.setCpCouponSkuCode(res.getString(res.getColumnIndex(CP_COUPON_SKU_CODE)));
                 coupons.setCpItemSkuCode(res.getString(res.getColumnIndex(CP_ITEM_CODE)));
                 coupons.setCpValue(res.getString(res.getColumnIndex(CP_VALUE)));
                 coupons.setCpStartDate(res.getString(res.getColumnIndex(CP_START_DATE)));
@@ -484,10 +556,10 @@ public class DBHelper extends SQLiteOpenHelper {
     public Productdata getItemByCouponsItemSkuCode(String skuCode){
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "select * from "+ITEM_TABLE_NAME+","+CP_TABLE_NAME+"" +
-                " where (itemSkuCode='"+skuCode+"' AND  cpItemSkuCode='"+skuCode+"')", null );
+                " where (itemSkuCode='"+skuCode+"' AND  cpItemSkuCode='"+skuCode+"') group by itemSkuCode", null );
         //System.out.println("getOrderDetailsByOrderId:"+skuCode);
         Productdata productdata = null;
-        System.out.println("count:"+res.getCount());
+        //System.out.println("count:"+res.getCount());
         if (res.moveToFirst()) {
             do {
                 productdata = new Productdata();
@@ -521,7 +593,160 @@ public class DBHelper extends SQLiteOpenHelper {
         db.update(ITEM_TABLE_NAME, contentValues, "itemSkuCode='"+productSku+"'", null);
         return true;
     }
+    public String getOrderDateByOrderId(String orderId)
+    {
+        String orderDate=null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select * from "+ORDERS_TABLE_NAME+" where orderId='"+orderId+"'", null);
+        //System.out.println("res: "+res.getCount());
+        if (res.moveToFirst()) {
+            do {
+                orderDate=res.getString(res.getColumnIndex(ORDERS_COLUMN_ORDERCREATEDAT));
+            } while (res.moveToNext());
+        }
+        return orderDate;
+    }
 
+    public Productdata getItemByCouponsItemSkuCode12(String skuCode,String cCode){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select * from "+ITEM_TABLE_NAME+","+CP_TABLE_NAME+"" +
+                " where (itemSkuCode='"+skuCode+"' AND  cpItemSkuCode='"+skuCode+"' AND  cpCouponSkuCode='"+cCode+"')", null );
+        //System.out.println("getOrderDetailsByOrderId:"+skuCode);
+        Productdata productdata = null;
+        //System.out.println("count:"+res.getCount());
+        if (res.moveToFirst()) {
+            do {
+                productdata = new Productdata();
+                productdata.setProductName(res.getString(res.getColumnIndex(ITEM_COLUMN_NAME)));
+                productdata.setPrice(res.getString(res.getColumnIndex(ITEM_COLUMN_PRICE)));
+                productdata.setBrand(res.getString(res.getColumnIndex(ITEM_COLUMN_BRAND)));
+                productdata.setSku(res.getString(res.getColumnIndex(ITEM_COLUMN_SKUCODE)));
+                productdata.setOffers(res.getString(res.getColumnIndex(CP_VALUE)));
+                Coupons c = new Coupons();
+                c.setCpCouponSkuCode(res.getString(res.getColumnIndex(CP_COUPON_SKU_CODE)));
+                c.setCpItemSkuCode(res.getString(res.getColumnIndex(CP_ITEM_CODE)));
+                c.setCpStartDate(res.getString(res.getColumnIndex(CP_START_DATE)));
+                c.setCpEndDate(res.getString(res.getColumnIndex(CP_END_DATE)));
+                c.setCpValue(res.getString(res.getColumnIndex(CP_VALUE)));
+                productdata.setCoupons(c);
+            } while (res.moveToNext());
+
+        }
+        return productdata;
+    }
+
+// Users operations it's for get user id by user email id
+
+    public String getUserid(String mEmail)
+    {
+        String userid=null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select * from "+USER_TABLE_NAME+" where userName='"+mEmail+"'", null);
+        //System.out.println("res: "+res.getCount());
+        if (res.moveToFirst()) {
+            do {
+                userid=res.getString(res.getColumnIndex(USER_COLUMN_ID));
+            } while (res.moveToNext());
+        }
+        return userid;
+    }
+
+//it's for get all user data
+
+    public ArrayList<Userdata> getalluser(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select * from "+USER_TABLE_NAME+" ", null );
+        ArrayList<Userdata> usersArrayList = new ArrayList<>();
+//        System.out.println("count:"+res.getCount());
+        if (res.moveToFirst()) {
+            do {
+                Userdata users = new Userdata();
+                users.setRole(res.getString(res.getColumnIndex(USER_COLUMN_ROLE)));
+                users.setUserId(res.getString(res.getColumnIndex(USER_COLUMN_NAME)));
+                users.setUsersStatus(res.getString(res.getColumnIndex(USER_COLUMN_STATUS)));
+                usersArrayList.add(users);
+            } while (res.moveToNext());
+        }
+        return usersArrayList;
+    }
+
+//it's code for entered wrong password into the 4 time
+    public void deactiveUser(String userid){
+        String user_status = "deactive";
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("userStatus", user_status);
+        System.out.println("deactiveUser "+userid);
+        db.update(USER_TABLE_NAME, contentValues, "userId='"+userid+"'", null);
+    }
+//it's for deactive user by admin
+
+    public boolean deactivateUserByAdmin(String uesrName,String status){
+        boolean result = false;
+        String user_status;
+        if(status.equalsIgnoreCase("active")){
+            user_status = "deactive";
+        }else {
+            user_status = "active";
+        }
+        //System.out.println("dbhelper user_status---"+ user_status);
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("userStatus", user_status);
+        //System.out.println(userid);
+        int i = db.update(USER_TABLE_NAME, contentValues, "userName='"+uesrName+"'", null);
+        if(i==1)result = true;
+        return result;
+    }
+// get customer details
+public  ArrayList<Customers> getAllCustomer()
+{
+    SQLiteDatabase db = this.getReadableDatabase();
+    Cursor res =  db.rawQuery( "select * from "+CUSTOMER_TABLE_NAME+" where storageStatus = '"+Constants.STORAGE_STATUS+"'  ", null );
+    ArrayList<Customers> customerseDetailsArrayList = new ArrayList<>();
+    if (res.moveToFirst()) {
+        do {
+            Customers customers = new Customers();
+            customers.setCustomerid(res.getString(res.getColumnIndex(CUSTOMER_COLUMN_CUSTOMERID)));
+            customers.setCustomeremail(res.getString(res.getColumnIndex(CUSTOMER_COLUMN_EMAIL)));
+            customers.setCustomername(res.getString(res.getColumnIndex(CUSTOMER_COLUMN_NAME)));
+            customers.setCustomerphone(res.getString(res.getColumnIndex(CUSTOMER_COLUMN_PHONE)));
+            customers.setCustomerplace(res.getString(res.getColumnIndex(CUSTOMER_COLUMN_CITY)));
+            customers.setCustomerstreet(res.getString(res.getColumnIndex(CUSTOMER_COLUMN_STREET)));
+            customerseDetailsArrayList.add(customers);
+        } while (res.moveToNext());
+    }
+    return customerseDetailsArrayList;
+}
+    public Customers getAllCustomerByContactNumber(String cnumber)
+    {
+        System.out.println("rohit");
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select * from "+CUSTOMER_TABLE_NAME+" where phone='"+cnumber+"' ", null );
+        Customers customers=null;
+
+        if (res.moveToFirst()) {
+            do {
+                customers=new Customers();
+                customers.setCustomeremail(res.getString(res.getColumnIndex(CUSTOMER_COLUMN_EMAIL)));
+                customers.setCustomername(res.getString(res.getColumnIndex(CUSTOMER_COLUMN_NAME)));
+                customers.setCustomerphone(res.getString(res.getColumnIndex(CUSTOMER_COLUMN_PHONE)));
+                customers.setCustomerplace(res.getString(res.getColumnIndex(CUSTOMER_COLUMN_CITY)));
+                customers.setCustomerstreet(res.getString(res.getColumnIndex(CUSTOMER_COLUMN_STREET)));
+            } while (res.moveToNext());
+        }
+        ///customers.setCustomerArrayList(customerseDetailsArrayList);
+        return customers;
+    }
+    public boolean getCustomerStatusByCustomerId(String customerId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from " + CUSTOMER_TABLE_NAME + " where "+CUSTOMER_COLUMN_CUSTOMERID+"='" + customerId + "'", null);
+        boolean status = false;
+        if (res.getCount() > 0) {
+            status = true;
+        }
+        return status;
+    }
 
 
 

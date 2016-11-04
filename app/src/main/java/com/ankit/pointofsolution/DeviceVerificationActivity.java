@@ -3,7 +3,6 @@ package com.ankit.pointofsolution;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,14 +23,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ankit.pointofsolution.api.ApiManager;
+import com.ankit.pointofsolution.config.Constants;
 import com.ankit.pointofsolution.config.Messages;
 import com.ankit.pointofsolution.config.StringUtils;
 import com.ankit.pointofsolution.storage.DBHelper;
 import com.ankit.pointofsolution.storage.Preferences;
 import com.ankit.pointofsolution.utility.NetworkOperations;
-import com.ankit.pointofsolution.utility.Utility;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,12 +45,10 @@ public class DeviceVerificationActivity extends AppCompatActivity  {
     public ApiManager apiManager;
     private String sResponseCode,sResponseDesc;
     private Activity activity;
-    private Context context;
     private ProgressDialog prgLoading = null;
     private Preferences preferences;
-    JSONObject jsonObj;
     DBHelper dbhelper;
-    private Utility utility;
+    private int count=1;
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -72,7 +67,6 @@ public class DeviceVerificationActivity extends AppCompatActivity  {
         VerificationCode = (EditText) findViewById(R.id.VerificationCode);
         preferences = new Preferences(activity);
         dbhelper = new DBHelper(this);
-        utility = new Utility(preferences, dbhelper);
 
         final StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -232,6 +226,11 @@ public class DeviceVerificationActivity extends AppCompatActivity  {
 
                 @Override
                 public void run() {
+                    if(count>3)
+                    {
+                        System.out.println("count is greater three");
+                        verficationcode= Constants.UNAUTHORIZED_USER;
+                    }
                     ApiManager.Status status = apiManager.processDeviceAuth(verficationcode);
                     if (status == ApiManager.Status.ERROR) {
                         sResponseCode = StringUtils.ERROR_CODE;
@@ -275,6 +274,13 @@ public class DeviceVerificationActivity extends AppCompatActivity  {
                                 showSnack(false, Messages.ACCESS_DENIED);
                             }
                         } else if (sResponseCode.equals(StringUtils.ERROR_CODE)) {
+                            count++;
+                            if(count>4)
+                            {
+                                Toast.makeText(getBaseContext(), Messages.DEVICE_DEACTIVE, Toast.LENGTH_LONG).show();
+                            }else {
+                                showSnack(false, apiManager.getErrorMessage());
+                            }
                             showSnack(false, apiManager.getErrorMessage());
                         }
                         hideLoading();

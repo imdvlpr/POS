@@ -2,13 +2,16 @@ package com.ankit.pointofsolution;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,18 +33,23 @@ import com.ankit.pointofsolution.config.Messages;
 import com.ankit.pointofsolution.dialog_fragments.AddItemCouponsFragment;
 import com.ankit.pointofsolution.dialog_fragments.AddItemManullyFragment;
 import com.ankit.pointofsolution.dialog_fragments.DialogueAlertsFragment;
+import com.ankit.pointofsolution.fragments.ProductGridFragment;
 import com.ankit.pointofsolution.modules.CustomerActivity;
 import com.ankit.pointofsolution.modules.ListofOrdersActivity;
+import com.ankit.pointofsolution.modules.ReturnExchangeActivity;
+import com.ankit.pointofsolution.modules.UserActivity;
 import com.ankit.pointofsolution.storage.DBHelper;
 import com.ankit.pointofsolution.storage.Preferences;
 import com.ankit.pointofsolution.utility.GetResponseDialogListener;
+import com.ankit.pointofsolution.utility.NetworkOperations;
 import com.ankit.pointofsolution.utility.SyncAdapter;
 import com.ankit.pointofsolution.utility.Utility;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,GetResponseDialogListener {
+        implements NavigationView.OnNavigationItemSelectedListener,GetResponseDialogListener
+        ,ProductGridFragment.OnFragmentInteractionListener {
     ApiManager apiManager;
     Preferences pref;
     private TextView vUseremail;
@@ -57,7 +65,7 @@ public class MainActivity extends AppCompatActivity
     public int totalprice;
     public static TextView vTotalconut,itemCount;
     Intent i;
-    private static DBHelper dbHelper;
+    private DBHelper dbHelper;
     public String orderId;
     public DrawerLayout drawer;
     private ArrayList<Coupons> couponsArrayList;
@@ -77,6 +85,18 @@ public class MainActivity extends AppCompatActivity
 
         // get the listview
         listView = (ExpandableListView) findViewById(R.id.list);
+        /*FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        ProductGridFragment hello = new ProductGridFragment();
+        fragmentTransaction.add(R.id.fragment_container, hello, "HELLO");
+        fragmentTransaction.commit();
+        TextView items = (TextView) findViewById(R.id.items);
+        items.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });*/
 
         // Defined Array values to show in ListView
         orderDetails = new OrderDetails();
@@ -84,7 +104,7 @@ public class MainActivity extends AppCompatActivity
         orderDetailsArrayList = new ArrayList<OrderDetails>();
         final StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
+        utility.getAllOrdersJson();
         vTotalconut = (TextView) findViewById(R.id.totalconut);
         itemCount   = (TextView) findViewById(R.id.itemcount);
 
@@ -116,15 +136,28 @@ public class MainActivity extends AppCompatActivity
                                             dbHelper.updateQuantitybyOidSku(pref.getCurrentOdrerId(),orderDetails.getItemSku(),
                                                                                      String.valueOf(orderDetails.getItemQty()));
                                         }else {
+                                            /*dbHelper.insertOrderDetails(pref.getCurrentOdrerId(), orderDetails.getItemSku(),
+                                                    String.valueOf(orderDetails.getItemQty()), String.valueOf(orderDetails.getItemPrice()),
+                                                    orderDetails.getsItemName());*/
+                                            String cCode=null,cValue=null;
+                                            if(orderDetails.getCouponsArrayList()!=null) {
+                                                if ((orderDetails.getCouponsArrayList().get(0).getCpCouponSkuCode() != null) &&
+                                                        (orderDetails.getCouponsArrayList().get(0).getCpValue() != null)) {
+                                                    cCode = orderDetails.getCouponsArrayList().get(0).getCpCouponSkuCode();
+                                                    cValue = orderDetails.getCouponsArrayList().get(0).getCpValue();
+                                                }
+                                            }
                                             dbHelper.insertOrderDetails(pref.getCurrentOdrerId(), orderDetails.getItemSku(),
                                                     String.valueOf(orderDetails.getItemQty()), String.valueOf(orderDetails.getItemPrice()),
-                                                    orderDetails.getsItemName());
+                                                    orderDetails.getsItemName(),cCode
+                                                    ,cValue);
                                         }
                                     }
                                 }else
                                 {
                              // In that part of code we need to put other details like OrderID, order Status, Offer on item
-                            dbHelper.insertOrders(orderId, Constants.ORDER_INITIAL_STATUS, Constants.ORDER_STORAGE_STATUS, "", "");
+                            dbHelper.insertOrders(orderId, Constants.ORDER_INITIAL_STATUS, Constants.STORAGE_STATUS,
+                                                                                "", "", utility.genrateCustomerID());
                             for (int i = 0; i < orderDetailsArrayList.size(); i++) {
                                 OrderDetails orderDetails = orderDetailsArrayList.get(i);
                                 //    System.out.println("orderDetailses:" + orderDetails.getItemSku());
@@ -136,13 +169,24 @@ public class MainActivity extends AppCompatActivity
                                 dbHelper.updateQuantitybyOidSku(pref.getCurrentOdrerId(),orderDetails.getItemSku(),
                                                     String.valueOf(qty));
                                 }else {
-                                dbHelper.insertOrderDetails(pref.getCurrentOdrerId(), orderDetails.getItemSku(),
+                                /*dbHelper.insertOrderDetails(pref.getCurrentOdrerId(), orderDetails.getItemSku(),
                                         String.valueOf(orderDetails.getItemQty()), String.valueOf(orderDetails.getItemPrice()),
-                                        orderDetails.getsItemName());
+                                        orderDetails.getsItemName());*/
+                                    String cCode=null,cValue=null;
+                                    if(orderDetails.getCouponsArrayList()!=null){
+                                    if((orderDetails.getCouponsArrayList().get(0).getCpCouponSkuCode()!=null) &&
+                                            (orderDetails.getCouponsArrayList().get(0).getCpValue()!=null)){
+                                        cCode = orderDetails.getCouponsArrayList().get(0).getCpCouponSkuCode();
+                                        cValue = orderDetails.getCouponsArrayList().get(0).getCpValue();
+                                    }
+                                    }
+                                    dbHelper.insertOrderDetails(pref.getCurrentOdrerId(), orderDetails.getItemSku(),
+                                            String.valueOf(orderDetails.getItemQty()), String.valueOf(orderDetails.getItemPrice()),
+                                            orderDetails.getsItemName(),cCode
+                                            ,cValue);
+
                                         }
                                     }
-                                    // String s = gson.toJson(orderDetailsArrayList, new TypeToken<ArrayList<OrderDetails>>(){}.getType());
-                                    //utility.makeOrders(s);
                                 }
                                 i = new Intent(MainActivity.this, PaymentOptionsActivity.class);
                                 startActivity(i);
@@ -182,6 +226,13 @@ public class MainActivity extends AppCompatActivity
             System.out.println("orderDetailsArrayList : "+orderDetailsArrayList.size());
             listViewAdpter = new ExpandableListAdapterTest(this, orderDetailsArrayList, res, this);
             listView.setAdapter(listViewAdpter);
+            for(int i=0;i<orderDetailsArrayList.size();i++)
+            {
+                if(orderDetailsArrayList.get(i).getCouponsArrayList()!=null)
+                {
+                    listView.expandGroup(i);
+                }
+            }
         }
         else {
             listViewAdpter = new ExpandableListAdapterTest(this, orderDetailsArrayList, res, this);
@@ -189,9 +240,8 @@ public class MainActivity extends AppCompatActivity
             listView.setAdapter(listViewAdpter);
             listViewAdpter.notifyDataSetChanged();
         }
-
         // Listview Group click listener
-        listView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+       /* listView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v,
@@ -209,9 +259,9 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onGroupExpand(int groupPosition) {
-                Toast.makeText(getApplicationContext(),
+                /*Toast.makeText(getApplicationContext(),
                         orderDetailsArrayList.get(groupPosition) + " Expanded",
-                        Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_SHORT).show();/
             }
         });
         // Listview Group collasped listener
@@ -224,7 +274,7 @@ public class MainActivity extends AppCompatActivity
                         Toast.LENGTH_SHORT).show();
 
             }
-        });
+        });*/
         // Listview on child click listener
         listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
@@ -232,7 +282,7 @@ public class MainActivity extends AppCompatActivity
             public boolean onChildClick(ExpandableListView parent, View v,
                                         int groupPosition, int childPosition, long id) {
                 // TODO Auto-generated method stub
-                return false;
+                return true;
             }
         });
     }
@@ -256,6 +306,46 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        //*** setOnQueryTextFocusChangeListener ***
+        /*searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String searchQuery) {
+                listViewAdpter.filter(searchQuery.toString().trim());
+                listView.invalidate();
+                return true;
+            }
+        });*/
+
+        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                // Do something when collapsed
+                return true;  // Return true to collapse action view
+            }
+
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                // Do something when expanded
+                return true;  // Return true to expand action view
+            }
+        });
         return true;
     }
 
@@ -303,6 +393,8 @@ public class MainActivity extends AppCompatActivity
             startActivity(i);
 
         } else if (id == R.id.nav_return) {
+            Intent i = new Intent(MainActivity.this,ReturnExchangeActivity.class);
+            startActivity(i);
 
         } else if (id == R.id.nav_reports) {
 
@@ -328,15 +420,33 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_logout) {
             apiManager.logout(pref);
         } else if (id == R.id.nav_help) {
+            Intent i = new Intent(this, UserActivity.class);
+            startActivity(i);
         }
         else if (id == R.id.sync) {
-            new SyncAdapter(this).execute();
+            NetworkOperations noptn = new NetworkOperations(this);
+            if (noptn.hasActiveInternetConnection(this)) {
+                new SyncAdapter(this).execute();
+                /*SyncAdapter syncAdapter = new SyncAdapter(this, "products");
+                syncAdapter.execute();
+                utility.StartAsyncTaskInParallel(syncAdapter);
+                SyncAdapter syncAdapter1 = new SyncAdapter(this, "orders");
+                syncAdapter1.execute();
+                utility.StartAsyncTaskInParallel(syncAdapter1);
+                SyncAdapter syncAdapter2 = new SyncAdapter(this, "customers");
+                syncAdapter2.execute();
+                utility.StartAsyncTaskInParallel(syncAdapter2);*/
+            }
+            else {
+                Toast.makeText(this,"Please connect Internet.", Toast.LENGTH_LONG).show();
+            }
         }
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
@@ -346,7 +456,7 @@ public class MainActivity extends AppCompatActivity
             // String scanFormat = scanningResult.getFormatName();
 //            System.out.println("scanContent: "+scanContent);
             if(scanContent != null){
-                productdata = utility.getProductDetailsbyCouponsItemSku(scanContent);
+                productdata = dbHelper.getItemBySkuCode(scanContent);
                 // Firstly take data in model object /
              if(productdata!=null)
                 {
@@ -403,14 +513,19 @@ public class MainActivity extends AppCompatActivity
                 }
             }
             if(itemInList) {
-                if (productdata1.getOffers() != null) {
-                    couponsArrayList = new ArrayList<>();
-                    System.out.println("offers set" + couponsArrayList.size()+"  -pos---"+pos);
-                    //couponsArrayList.clear();
-                    couponsArrayList.add(productdata1.getCoupons());
-                    orderDetailsArrayList.get(pos).setCouponsArrayList(couponsArrayList);
-                    listView.expandGroup(pos,true);
-                } else {
+                if (productdata1.getOffers() != null ) {
+                    if (Double.parseDouble(productdata1.getCoupons().getCpValue())
+                            < Double.parseDouble(productdata1.getPrice())) {
+                        couponsArrayList = new ArrayList<>();
+                        System.out.println("offers set" + couponsArrayList.size() + "  -pos---" + pos);
+                        //couponsArrayList.clear();
+                        couponsArrayList.add(productdata1.getCoupons());
+                        orderDetailsArrayList.get(pos).setCouponsArrayList(couponsArrayList);
+                        listView.expandGroup(pos, true);
+                    } else {
+                        Toast.makeText(this, Messages.INVALID_COUPON, Toast.LENGTH_LONG).show();
+                    }
+                }else {
                     orderDetailsArrayList.get(pos).setItemQty(orderDetailsArrayList.get(pos).getItemQty() + 1);
                 }
                 //couponsArrayList.clear();
@@ -434,4 +549,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
 }

@@ -1,5 +1,12 @@
 package com.ankit.pointofsolution.utility;
 
+import android.annotation.TargetApi;
+import android.os.AsyncTask;
+import android.os.Build;
+
+import com.ankit.pointofsolution.Models.Customers;
+import com.ankit.pointofsolution.Models.OrderDetails;
+import com.ankit.pointofsolution.Models.Orders;
 import com.ankit.pointofsolution.Models.Productdata;
 import com.ankit.pointofsolution.config.Constants;
 import com.ankit.pointofsolution.storage.DBHelper;
@@ -92,18 +99,18 @@ public class Utility {
 
     public String genrateOrderID()
     {
-        String orderid = null;
         int oid = 0;
+        String orderid;
         String imei =  pref.getIMEI();
         String slast5imei = imei.substring(Math.max(imei.length() - 5, 0));
         if(pref.getAutoIncreamentId()==0)   //|| pref.getAutoIncreamentId()==Constants.INITIAL_ORDER_ID
         {
             oid = Constants.INITIAL_ORDER_ID;
             pref.setAutoIncreamentId(oid);
-        }else {
+        }else{
             oid = pref.getAutoIncreamentId();
         }
-        orderid = slast5imei + oid;
+        orderid = slast5imei+oid;
         //System.out.println("dbHelper.getOrderStatusByOrderId(orderid):"+orderid+":"+dbHelper.getOrderStatusByOrderId(orderid));
         //dbHelper.numberOfOrderDetailsByOrderId(orderid)>0 &&
         if(!dbHelper.getOrderStatusByOrderId(orderid).equals("false")
@@ -111,35 +118,40 @@ public class Utility {
         {
             int a = pref.getAutoIncreamentId()+1;
             pref.setAutoIncreamentId(a);
-            orderid = slast5imei + a;
+            orderid = slast5imei+a;
             //System.out.println("utility orderid:"+orderid);
         }
+        //String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        //orderid = timestamp+last 5 digit IMEI+ INITIAL_ORDER_ID(Auto increamented)
+        //orderid = orderid+timestamp;
         return orderid;
     }
-
-    /*public void makeOrders(String productJson)
+    public String genrateCustomerID()
     {
-        JSONArray ja = new JSONArray();
-        JSONObject js = new JSONObject();
-        JSONObject js1 = new JSONObject();
-        HashMap<String, String> orderdetailsMap = new HashMap<>();
-        String orderId = genrateOrderID();
-        pref.setCurrentOdrerId(orderId);
-        try {
-            //js.put("orderID","001111");
-            js.put(Constants.KEY_PRODUCT_DETAILS,productJson);
-            js.put(Constants.KEY_ORDER_STATUS, Constants.ORDER_INITIAL_STATUS);
-            js.put(Constants.KEY_ORDER_STORAGE_STATUS, Constants.ORDER_STORAGE_STATUS);
-            js.put(Constants.KEY_TIMESTAMP, "");
-            ja.put(js);
-            js1.put(orderId,ja);
-            orderdetailsMap.put(orderId,js.toString());
-            System.out.println("a: "+js1.toString());
-            pref.setOrderDetails(orderdetailsMap);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        String customerid = null;
+        int cid = 0;
+        String imei =  pref.getIMEI();
+        String slast5imei = imei.substring(Math.max(imei.length() - 5, 0));
+        slast5imei ="C"+slast5imei;
+        if(pref.getCustomerAutoIncreamentId()==0)   //|| pref.getAutoIncreamentId()==Constants.INITIAL_ORDER_ID
+        {
+            cid = Constants.INITIAL_ORDER_ID;
+            pref.setCustomerAutoIncreamentId(cid);
+        }else {
+            cid = pref.getCustomerAutoIncreamentId();
         }
-    }*/
+        customerid = slast5imei + cid;
+        System.out.println("dbHelper.getCustomerStatusByCustomerId(orderid):"+customerid+":"+dbHelper.getCustomerStatusByCustomerId(customerid));
+        //dbHelper.numberOfOrderDetailsByOrderId(orderid)>0 &&
+        if(dbHelper.getCustomerStatusByCustomerId(customerid))
+            {
+            int a = pref.getCustomerAutoIncreamentId()+1;
+            pref.setCustomerAutoIncreamentId(a);
+            customerid = slast5imei + a;
+            System.out.println("utility customerid:"+customerid);
+        }
+        return customerid;
+    }
 
    public void saveItemsindb(String data)
    {
@@ -192,6 +204,90 @@ public class Utility {
         Productdata productdata = dbHelper.getItemByCouponsItemSkuCode(skucode);
         return productdata;
     }
+    public Productdata getProductDetailsbyCouponsItemSku12(String skucode,String cCode)
+    {
 
+        Productdata productdata = dbHelper.getItemByCouponsItemSkuCode12(skucode,cCode);
+        return productdata;
+    }
+// Get common deatils and make a Json
+    public String getAllCustomerJson()
+    {   String result = null;
+        ArrayList<Customers> customersArrayList = dbHelper.getAllCustomer();
+        JSONArray jArray = new JSONArray();
+        try {
+            for(int i=0;i<customersArrayList.size();i++)
+            {
+                JSONObject json_data = new JSONObject();
+                json_data.put("customerId",customersArrayList.get(i).getCustomerid());
+                json_data.put("name",customersArrayList.get(i).getCustomername());
+                json_data.put("email",customersArrayList.get(i).getCustomeremail());
+                json_data.put("address",customersArrayList.get(i).getCustomerstreet());
+                json_data.put("phone_number",customersArrayList.get(i).getCustomerphone());
+                json_data.put("imei", pref.getIMEI());
+                jArray.put(i,json_data);
+            }
+            result = jArray.toString();
+            System.out.println("jarray:"+jArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    // Get orders & orders deatils and make a Json
+    public String getAllOrdersJson()
+    {
+        String result = "";
+        JSONArray jArray = new JSONArray();
+        JSONArray jArray1 = new JSONArray();
+        ArrayList<Orders> ordersArrayList = dbHelper.getAllOrders();
+        try {
+            for(int i=0;i<ordersArrayList.size();i++)
+            {
+                JSONObject json_data = new JSONObject();
+                json_data.put("orderId",ordersArrayList.get(i).getOrderId());
+                json_data.put("orderStatus",ordersArrayList.get(i).getOrderStatus());
+                json_data.put("orderOffers",ordersArrayList.get(i).getOrderOffers());
+                json_data.put("orderPromotions",ordersArrayList.get(i).getOrderPromotions());
+                json_data.put("orderPaymentType",ordersArrayList.get(i).getOrderPaymentType());
+                json_data.put("orderPaymentPrice",ordersArrayList.get(i).getOrderPaymentPrice());
+                json_data.put("orderPaymentStatus",ordersArrayList.get(i).getOrderPaymentStatus());
+                json_data.put("orderCustomerId",ordersArrayList.get(i).getOrderCustomerId());
+                json_data.put("orderCreatedBy",ordersArrayList.get(i).getOrderCreatedBy());
+                json_data.put("orderCreatedAt",ordersArrayList.get(i).getOrderCreatedAt());
+                ArrayList<OrderDetails> orderDetailsArrayList = dbHelper.getOrderDetailsByOrderId(ordersArrayList.get(i).getOrderId());
+                for(int j=0;j<orderDetailsArrayList.size();j++) {
+                    JSONObject json_data1 = new JSONObject();
+                    json_data1.put("productName",orderDetailsArrayList.get(j).getsItemName());
+                    json_data1.put("productPrice",orderDetailsArrayList.get(j).getItemPrice());
+                    json_data1.put("productSku",orderDetailsArrayList.get(j).getItemSku());
+                    json_data1.put("productQty",orderDetailsArrayList.get(j).getItemQty());
+                    String couponcode = "",couponvalue = "";
+                    if(orderDetailsArrayList.get(j).getCouponsArrayList()!=null) {
+                        couponcode = orderDetailsArrayList.get(j).getCouponsArrayList().get(0).getCpCouponSkuCode();
+                        couponvalue = orderDetailsArrayList.get(j).getCouponsArrayList().get(0).getCpValue();
+                    }
+                    json_data1.put("procductCcode", couponcode);
+                    json_data1.put("procductCvalue", couponvalue);
+                    jArray1.put(j,json_data1);
+                }
+                json_data.put("products",jArray1);
+                jArray.put(i,json_data);
+            }
+            System.out.println("jarray:"+jArray);
+            result = jArray.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public void StartAsyncTaskInParallel(SyncAdapter task) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        else
+            task.execute();
+    }
 
 }

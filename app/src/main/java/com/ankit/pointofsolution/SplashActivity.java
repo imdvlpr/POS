@@ -1,10 +1,8 @@
 package com.ankit.pointofsolution;
 
 import android.content.Intent;
-import android.os.Handler;
-import android.provider.SyncStateContract;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.ankit.pointofsolution.storage.DBHelper;
 import com.ankit.pointofsolution.storage.Preferences;
@@ -19,7 +17,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         preferences = new Preferences(SplashActivity.this);
         dbHelper = new DBHelper(this);
-        dbHelper.getAllCotacts();
+        dbHelper.getAllContacts();
         Thread timerThread = new Thread(){
             public void run(){
                 try{

@@ -20,10 +20,10 @@
             android:gravity="center_vertical|start"
             />
     <TextView
-
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Items"
+        android:id="@+id/items"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/album_title"
         android:textStyle="bold"
@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/totalconut"
-            android:hint="1275.00"
+            android:hint="00.00"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/album_title"
             android:textStyle="bold"
@@ -58,7 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/paymentoptions"
-        android:src="@drawable/ic_done_black"
+        android:src="@drawable/checkout_circle_grn"
         android:layout_gravity="center_vertical|end"
         android:layout_marginEnd="2dp"
         />

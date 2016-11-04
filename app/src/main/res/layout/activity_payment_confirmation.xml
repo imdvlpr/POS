@@ -23,6 +23,4 @@
 
     <include layout="@layout/content_payment_confirmation" />
 
-
-
 </android.support.design.widget.CoordinatorLayout>

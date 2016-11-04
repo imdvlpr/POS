@@ -6,7 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
+import android.view.View;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.ankit.pointofsolution.Models.OrderDetails;
@@ -19,9 +20,14 @@ import java.util.ArrayList;
 public class OrdersDetailsActivity extends AppCompatActivity {
 
     DBHelper dbHelper;
-    private ListView listView;
+    //private ListView listView;
+    // private CustomAdapter customAdapter;
     private CustomAdapter customAdapter;
+    public static ExpandableListView listView;
+    public static  ArrayList<OrderDetails> orderDetailsArrayList;
     private Resources res;
+    //public static ExpandableListView listView;
+    public static TextView oTotalconut,oitemCount,orderDate;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,18 +41,71 @@ public class OrdersDetailsActivity extends AppCompatActivity {
         TextView orderId = (TextView) findViewById(R.id.orderId);
 
         orderId.setText(s);
-        ArrayList<OrderDetails> orderDetailsArrayList = dbHelper.getOrderDetailsByOrderId(s);
+        orderDetailsArrayList = dbHelper.getOrderDetailsByOrderId(s);
+        String orderDateByOrderId = dbHelper.getOrderDateByOrderId(s);
+
+
         // Get ListView object from xml
-        listView = (ListView) findViewById(R.id.orderDetailsList);
-        listView = (ListView) findViewById(R.id.orderDetailsList);
-        customAdapter = new CustomAdapter(this, orderDetailsArrayList, res);
+        oTotalconut = (TextView) findViewById(R.id.totalconut);
+        oitemCount   = (TextView) findViewById(R.id.itemcountno);
+        orderDate = (TextView) findViewById(R.id.orderDate);
+        String[] sorderDate = orderDateByOrderId.split(" ");
+        orderDate.setText(sorderDate[0]);
+        listView = (ExpandableListView) findViewById(R.id.list);
+
+        // listView = (ListView) findViewById(R.id.orderDetailsList);
+        // customAdapter = new CustomAdapter(this, orderDetailsArrayList, res);
+        customAdapter = new CustomAdapter(this, orderDetailsArrayList, res, this);
         listView.setAdapter(customAdapter);
         customAdapter.notifyDataSetChanged();
+        for(int i=0;i<orderDetailsArrayList.size();i++)
+        {
+            if(orderDetailsArrayList.get(i).getCouponsArrayList()!=null)
+            {
+                listView.expandGroup(i);
+            }
+        }
+        listView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v,
+                                        int groupPosition, long id) {
+
+                return true;
+            }
+        });
+        // Listview Group expanded listener
+        listView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+
+            @Override
+            public void onGroupExpand(int groupPosition) {
+
+            }
+        });
+        // Listview Group collasped listener
+        listView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+
+            @Override
+            public void onGroupCollapse(int groupPosition) {
+
+
+            }
+        });
+        // Listview on child click listener
+        listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v,
+                                        int groupPosition, int childPosition, long id) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+        });
     }
 
     @Override
     public void onBackPressed() {
-       super.onBackPressed();
+        super.onBackPressed();
     }
 
     @Override
@@ -67,6 +126,8 @@ public class OrdersDetailsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 
 
 }

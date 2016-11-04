@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical">
+
+    <TextView android:id="@+id/title_paired_devices"
+        android:layout_width="fill_parent" android:layout_height="wrap_content"
+        android:text="@string/title_activity_bluetooth_devicelist" android:visibility="visible"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/colorAccent1"
+        android:padding="16dip"
+        android:textSize="@dimen/album_title"/>
+    <ListView android:id="@+id/paired_devices"
+        android:layout_width="fill_parent" android:layout_height="wrap_content"
+        android:stackFromBottom="false" android:layout_weight="1" />
+</LinearLayout>

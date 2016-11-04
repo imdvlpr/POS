@@ -8,6 +8,7 @@ public class Userdata {
     public String role;
     public String userId;
     public String encryptedPassword;
+    public String UsersStatus;
 
     public Userdata() {
     }
@@ -40,5 +41,13 @@ public class Userdata {
 
     public void setEncryptedPassword(String encryptedPassword) {
         this.encryptedPassword = encryptedPassword;
+    }
+
+    public String getUsersStatus() {
+        return UsersStatus;
+    }
+
+    public void setUsersStatus(String usersStatus) {
+        UsersStatus = usersStatus;
     }
 }

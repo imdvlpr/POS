@@ -10,8 +10,13 @@ public class Constants {
 	public static final String POS_TOKEN = "posToken";
 	public static final String API_STATUS = "status";
 	public static final String API_MESSAGE = "message";
-	public static final String sIMEI = "123456789098765";
 
+	public static final String POS_ID = "pos_id";
+	public static final String PHONE_CODE = "phone_code";
+	public static final String STORE_NAME = "storeName";
+	public static final String STORE_EMAIL = "storeEmail";
+
+	public static final String sIMEI = "123456789098765";
 
 	public static final String CRASH_REPORT_EMAIL_ID = "ankitjain@ssism.org";
 	public static final boolean DELETE_FILES_AFTER_UPLOAD = true; 
@@ -33,12 +38,13 @@ public class Constants {
 	public static final String ADD_ITEM_TYPE_2 = "ADD_IN_CATALOG";
 	public static final String ADD_COUPONS = "ADD_COUPONS";
 
-	public static final String ORDER_STORAGE_STATUS = "NOT_SYNCED";
+	public static final String STORAGE_STATUS = "NOT_SYNCED";
+	public static final String STORAGE_STATUS1 = "SYNCED";
 	public static final String ORDER_INITIAL_STATUS = "IN_PROGRESS";
 	public static final String ORDER_FINAL_STATUS = "COMPLETED";
 	// Spinner loop max values
 	public static final int QUANTITY_MAX_VALUE = 5;
-	public static final Integer INITIAL_ORDER_ID = 100001;
+	public static final Integer INITIAL_ORDER_ID = 10001;
 
 	//Status Keys & values
 	public static final String KEY_PRODUCT_DETAILS ="productsdetails";
@@ -50,9 +56,7 @@ public class Constants {
 	public static final String KEY_CASH_PAYMENT = "CASH_PAYMENT";
 	public static final String KEY_DEBIT_CARD_PAYMENT = "DEBIT_CARD_PAYMENT";
 	public static final String KEY_PAYMENT_STATUS = "SUCCESS";
+	public static final String UNAUTHORIZED_USER = "Unauthorizeddevice";
 	//db helpers
-
-
-
 
 }

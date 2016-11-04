@@ -15,8 +15,6 @@ import com.ankit.pointofsolution.config.StringUtils;
 import com.ankit.pointofsolution.storage.DBHelper;
 import com.ankit.pointofsolution.storage.Preferences;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 /**
@@ -33,45 +31,60 @@ public class SyncAdapter extends AsyncTask<String, String, String> {
     private Preferences preferences;
     private Activity activity;
     private DBHelper dbHelper;
-    private NetworkOperations noptn;
-    private JSONObject jsonObj;
+    String status;
+    String sApitocall;
 
+    public SyncAdapter(Activity activity, String apitocall) {
+        this.activity = activity;
+        apiManager = new ApiManager(activity);
+        preferences=new Preferences(activity);
+        dbHelper=new DBHelper(activity);
+        utility=new Utility(preferences,dbHelper);
+        sApitocall = apitocall;
+    }
     public SyncAdapter(Activity activity) {
         this.activity = activity;
         apiManager = new ApiManager(activity);
         preferences=new Preferences(activity);
         dbHelper=new DBHelper(activity);
         utility=new Utility(preferences,dbHelper);
-        noptn = new NetworkOperations(activity);
     }
-
 
     @Override
     protected void onPreExecute() {
-        super.onPreExecute();
+        /*super.onPreExecute();
         pDialog = new ProgressDialog(activity);
         pDialog.setMessage("Please wait while Records Synching with Server.");
-        pDialog.setIndeterminate(false);
-        pDialog.setCancelable(true);
-        pDialog.show();
+        pDialog.show();*/
     }
 
     @Override
     protected String doInBackground(String... params) {
 
-
-        if (noptn.hasActiveInternetConnection(activity)) {
             //ToDo write your code here to check
             // Create Inner Thread Class\
             Thread background = new Thread(new Runnable() {
                 Message msg = new Message();
                 Bundle bndle = new Bundle();
-
+                ApiManager.Status APIstatus;
                 @Override
                 public void run() {
-
-                    ApiManager.Status status = apiManager.processImportItemData();
-                    if (status == ApiManager.Status.ERROR) {
+                    /*switch (sApitocall)
+                    {
+                        case "product":
+                            APIstatus = apiManager.processImportItemData();
+                            break;
+                        case "orders":
+                            APIstatus = apiManager.processExpotOrdersData(utility.getAllOrdersJson());
+                            break;
+                        case "customers":
+                            APIstatus = apiManager.processExpotCustomerData();
+                            break;
+                        default:
+                            APIstatus = ApiManager.Status.ERROR;
+                    }*/
+                    ApiManager.Status APIstatus = apiManager.processImportItemData();
+                    if (APIstatus == ApiManager.Status.ERROR) {
                         sResponseCode = StringUtils.ERROR_CODE;
                         sResponseDesc = apiManager.getErrorMessage();
                         bndle.putString(StringUtils.CODE, sResponseCode);
@@ -95,24 +108,48 @@ public class SyncAdapter extends AsyncTask<String, String, String> {
                         sResponseDesc = msg.getData().getString(StringUtils.DESC);
                         if (sResponseCode.equals(StringUtils.SUCCESS)) {
                             if ((null != sResponseDesc)) {
-                                 System.out.println("sResponseDesc:" + sResponseDesc);
-                                Toast.makeText(activity, Messages.SYNC_SUCCESS, Toast.LENGTH_LONG).show();
+                                status = sResponseCode;
+                                 System.out.println("sResponseDesc:" + sResponseCode);
+                                 hideLoading(status);
+                            }else{
+                                status = StringUtils.ERROR_CODE;
+                                hideLoading(status);
                             }
+                        }else{
+                            status = StringUtils.ERROR_CODE;
+                           // hideLoading(status);
                         }
                     }
+
                 };
             });
             background.start();
-        }
-        else {
-            Toast.makeText(activity,"Please connect Internet.", Toast.LENGTH_LONG).show();
-        }
-        return null;
-    }
-    protected void onPostExecute() {
 
-        pDialog.dismiss();
-        Toast.makeText(activity,"Data Synced to server successfully.", Toast.LENGTH_LONG).show();
+        return status;
     }
+    /**
+     * To close the loading dialog
+     */
+
+    protected void hideLoading(String status) {
+        try {
+            //status = this.status;
+            System.out.println("onPostExecute"+ this.status );
+            if(status!=null)
+            {
+                Toast.makeText(activity,"Data Synced to server successfully.", Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(activity,Messages.UNAUTHORIZED_ACCESS, Toast.LENGTH_LONG).show();
+            }
+            //pDialog.dismiss();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    protected void onPostExecute(String status) {
+
+       // pDialog.dismiss();
+    }
+
 
 }

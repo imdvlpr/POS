@@ -1,0 +1,105 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/card_margin"
+    android:showDividers="beginning|end"
+    android:background="@drawable/borders_shadow">
+
+
+
+    <LinearLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:baselineAligned="true"
+        android:padding="@dimen/card_margin"
+        android:visibility="visible"
+        android:id="@+id/Linearview"
+        android:orientation="horizontal">
+
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:baselineAligned="true"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Item test item size"
+                android:textSize="@dimen/album_title"
+                android:textColor="@color/item_name"
+                android:id="@+id/LitemName"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="34392932k234kjs"
+                android:layout_marginTop="@dimen/margin"
+                android:id="@+id/LitemSku"
+                android:textSize="@dimen/item_sku"
+                />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_weight="0.4">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/Rs"
+                android:id="@+id/LitemPrice"
+                android:layout_marginRight="8dp"
+                android:layout_weight="0.1"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/LitemQty"
+                android:textSize="@dimen/orignal_price"
+                android:hint="99.45"
+                android:layout_marginRight="8dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/moreQuantity"
+                android:textSize="@dimen/orignal_price"
+                android:text="@string/add"
+                android:layout_marginRight="12dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/Rs"
+                android:id="@+id/LItemTotal"
+                android:textStyle="bold"
+                android:textAlignment="viewStart"
+                android:layout_marginRight="8dp"
+                android:layout_weight="0.1"/>
+            <CheckBox
+                android:text=""
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/checkBox"
+                android:layout_weight="1" />
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <!--<include
+        layout="@layout/footer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        />-->
+</LinearLayout>

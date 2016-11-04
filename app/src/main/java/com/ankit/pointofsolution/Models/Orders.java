@@ -14,23 +14,19 @@ public class Orders implements Parcelable {
     private String orderStorageStatus;
     private String orderOffers;
     private String orderPromotions;
+    private String orderPaymentType;
+    private String orderPaymentPrice;
+    private String orderPaymentStatus;
     private String orderCreatedAt;
     private String orderUpdatedAt;
+
+    private String orderCreatedBy;
+    private String orderCustomerId;
+
 
     public Orders() {
     }
 
-    public Orders(String orderId, String orderStatus, String orderStorageStatus, String orderOffers,
-                  String orderPromotions, String orderCreatedAt, String orderUpdatedAt)
-    {
-        this.orderId = orderId;
-        this.orderStatus = orderStatus;
-        this.orderStorageStatus = orderStorageStatus;
-        this.orderOffers = orderOffers;
-        this.orderPromotions = orderPromotions;
-        this.orderCreatedAt = orderCreatedAt;
-        this.orderUpdatedAt = orderUpdatedAt;
-    }
 
     protected Orders(Parcel in) {
         orderId = in.readString();
@@ -38,8 +34,13 @@ public class Orders implements Parcelable {
         orderStorageStatus = in.readString();
         orderOffers = in.readString();
         orderPromotions = in.readString();
+        orderPaymentType = in.readString();
+        orderPaymentPrice = in.readString();
+        orderPaymentStatus = in.readString();
         orderCreatedAt = in.readString();
         orderUpdatedAt = in.readString();
+        orderCreatedBy = in.readString();
+        orderCustomerId = in.readString();
     }
 
     public static final Creator<Orders> CREATOR = new Creator<Orders>() {
@@ -110,6 +111,46 @@ public class Orders implements Parcelable {
         this.orderUpdatedAt = orderUpdatedAt;
     }
 
+    public String getOrderPaymentType() {
+        return orderPaymentType;
+    }
+
+    public void setOrderPaymentType(String orderPaymentType) {
+        this.orderPaymentType = orderPaymentType;
+    }
+
+    public String getOrderPaymentPrice() {
+        return orderPaymentPrice;
+    }
+
+    public void setOrderPaymentPrice(String orderPaymentPrice) {
+        this.orderPaymentPrice = orderPaymentPrice;
+    }
+
+    public String getOrderPaymentStatus() {
+        return orderPaymentStatus;
+    }
+
+    public void setOrderPaymentStatus(String orderPaymentStatus) {
+        this.orderPaymentStatus = orderPaymentStatus;
+    }
+
+    public String getOrderCreatedBy() {
+        return orderCreatedBy;
+    }
+
+    public void setOrderCreatedBy(String orderCreatedBy) {
+        this.orderCreatedBy = orderCreatedBy;
+    }
+
+    public String getOrderCustomerId() {
+        return orderCustomerId;
+    }
+
+    public void setOrderCustomerId(String orderCUstomerId) {
+        this.orderCustomerId = orderCUstomerId;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -122,7 +163,12 @@ public class Orders implements Parcelable {
         parcel.writeString(orderStorageStatus);
         parcel.writeString(orderOffers);
         parcel.writeString(orderPromotions);
+        parcel.writeString(orderPaymentType);
+        parcel.writeString(orderPaymentPrice);
+        parcel.writeString(orderPaymentStatus);
         parcel.writeString(orderCreatedAt);
         parcel.writeString(orderUpdatedAt);
+        parcel.writeString(orderCreatedBy);
+        parcel.writeString(orderCustomerId);
     }
 }

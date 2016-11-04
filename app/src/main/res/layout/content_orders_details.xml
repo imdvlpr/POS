@@ -5,21 +5,44 @@
     android:id="@+id/content_orders_details"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.ankit.pointofsolution.modules.OrdersDetailsActivity"
     tools:showIn="@layout/activity_orders_details"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
-    <include
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <include
+            layout="@layout/sidebar"
+            android:elevation="10dp"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <include
         layout="@layout/order_detail_header"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
 
-    <ListView
+    <!--<ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/orderDetailsList"/>
+        android:id="@+id/orderDetailsList"/>-->
+    <ExpandableListView
+        android:id="@+id/list"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_marginTop="8dp"
+        android:clickable="false"
+        android:groupIndicator="@null"/>
+        </LinearLayout>
 </LinearLayout>

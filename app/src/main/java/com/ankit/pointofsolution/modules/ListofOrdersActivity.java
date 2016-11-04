@@ -22,7 +22,9 @@ import com.ankit.pointofsolution.api.ApiManager;
 import com.ankit.pointofsolution.config.Messages;
 import com.ankit.pointofsolution.storage.DBHelper;
 import com.ankit.pointofsolution.storage.Preferences;
+import com.ankit.pointofsolution.utility.NetworkOperations;
 import com.ankit.pointofsolution.utility.SyncAdapter;
+import com.ankit.pointofsolution.utility.Utility;
 
 import java.util.ArrayList;
 
@@ -37,6 +39,7 @@ public class ListofOrdersActivity extends AppCompatActivity
     private ListView listView;
     private ArrayList<Orders> ordersArrayList;
     private OrdersAdapter ordersAdapter;
+    private Utility utility;
 
 
     @Override
@@ -50,6 +53,7 @@ public class ListofOrdersActivity extends AppCompatActivity
         apiManager = new ApiManager(this);
         pref = new Preferences(this);
         dbHelper = new DBHelper(this);
+        utility = new Utility();
         listView = (ListView) findViewById(R.id.list);
         ordersArrayList = dbHelper.getAllOrders();
         System.out.println("ordersArrayList:"+ ordersArrayList.size());
@@ -158,7 +162,22 @@ public class ListofOrdersActivity extends AppCompatActivity
         } else if (id == R.id.nav_help) {
         }
         else if (id == R.id.sync) {
-            new SyncAdapter(this).execute();
+            NetworkOperations noptn = new NetworkOperations(this);
+            if (noptn.hasActiveInternetConnection(this)) {
+                new SyncAdapter(this).execute();
+                /*SyncAdapter syncAdapter = new SyncAdapter(this, "products");
+                syncAdapter.execute();
+                utility.StartAsyncTaskInParallel(syncAdapter);
+                SyncAdapter syncAdapter1 = new SyncAdapter(this, "orders");
+                syncAdapter1.execute();
+                utility.StartAsyncTaskInParallel(syncAdapter1);
+                SyncAdapter syncAdapter2 = new SyncAdapter(this, "customers");
+                syncAdapter2.execute();
+                utility.StartAsyncTaskInParallel(syncAdapter2);*/
+            }
+            else {
+                Toast.makeText(this,"Please connect Internet.", Toast.LENGTH_LONG).show();
+            }
         }
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

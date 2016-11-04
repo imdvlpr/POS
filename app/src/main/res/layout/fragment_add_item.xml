@@ -1,4 +1,9 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
@@ -7,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:scaleType="center"
-        android:background="#FFFFBB33"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/colorAccent1"
         android:contentDescription="@string/app_name"
         android:text="@string/add_item"
         android:textSize="25dp"
@@ -99,3 +105,4 @@
         android:id="@+id/additem"/>
 
 </LinearLayout>
+</ScrollView>

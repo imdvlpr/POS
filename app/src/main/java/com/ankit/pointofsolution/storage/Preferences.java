@@ -46,6 +46,14 @@ public class Preferences {
 	public static final String KEY_AUTO_INCREAMENT_ID = "AUTO_INCREAMENT_ID";
 	public static final String KEY_CURRENT_ORDER_ID = "CURRENT_ORDER_ID";
 	public static final String KEY_POS_TOKEN = "POS_TOKEN";
+	public static final String KEY_TOTAL_PRICE = "TOTAL_PRICE";
+	public static final String KEY_POS_ID = "POS_ID";
+	public static final String KEY_PHONE_CODE = "PHONE_CODE";
+	public static final String KEY_STORE_NAME = "STORE_NAME";
+	public static final String KEY_STORE_MAIL = "STORE_MAIL";
+	//Customer keys
+	public static final String KEY_CUSTOMER_AUTO_INCREAMENT_ID = "AUTO_CUSTOMER_INCREAMENT_ID";
+	public static final String KEY_CURRENT_CUSTOMER_ID = "CURRENT_CUSTOMER_ID";
 
 
 
@@ -294,7 +302,7 @@ public class Preferences {
 	public String getCurrentOdrerId() {
 		return getValue(KEY_CURRENT_ORDER_ID, "");
 	}
-		/*public void saveMarketplaces(Map<String, String> stringMap) {
+	/*public void saveMarketplaces(Map<String, String> stringMap) {
 				if (stringMap != null) {
 				SharedPreferences keys = activity.getSharedPreferences(KEY_MARKETPLACE_LIST, Context.MODE_PRIVATE);
 				Editor editor = keys.edit();
@@ -302,13 +310,13 @@ public class Preferences {
 				editor.putString(s, stringMap.get(s));
 				}
 				editor.commit();
-				}
-				}
+			}
+		}
 
-		public Map<String, String> loadMarketplaces() {
+	public Map<String, String> loadMarketplaces() {
 				SharedPreferences keys = activity.getSharedPreferences(KEY_MARKETPLACE_LIST, Context.MODE_PRIVATE);
 				return (Map<String, String>) keys.getAll();
-				}*/
+		}*/
 	public void clearFilePaths() {
 		Editor prefsEditor = prefsPrivate.edit();
 
@@ -316,7 +324,6 @@ public class Preferences {
 
 		prefsEditor.commit();
 	}
-
 	/*
    		get the IMEI no of device
     */
@@ -326,13 +333,61 @@ public class Preferences {
 		String sIMEI = telephonyManager.getDeviceId();
 		return sIMEI;
 	}
-
 	public void setPosToken(String sPosToken) {
 		putValue(KEY_POS_TOKEN, sPosToken);
 	}
 	public String getPosToken() {
 		return getValue(KEY_POS_TOKEN, "");
 	}
+	public void setPrice(String sPrice) {
+		putValue(KEY_TOTAL_PRICE, sPrice);
+	}
+	public String getPrice() {
+		return getValue(KEY_TOTAL_PRICE, "");
+	}
+
+	//Pos details key & values
+	public void setPosId(String sPosID) {
+		putValue(KEY_POS_ID, sPosID);
+	}
+	public String getPosId() {
+		return getValue(KEY_POS_ID, "");
+	}
+
+	public void setPhoneCode(String sPhoneCode) {
+		putValue(KEY_POS_ID, sPhoneCode);
+	}
+	public String getPhoneCode() {
+		return getValue(KEY_POS_ID, "");
+	}
+
+	public void setStoreName(String sStoreName) {
+		putValue(KEY_STORE_NAME, sStoreName);
+	}
+	public String getStoreName() {
+		return getValue(KEY_STORE_NAME, "");
+	}
+
+	public void setStoreMail(String sStoreMail) {
+		putValue(KEY_STORE_MAIL, sStoreMail);
+	}
+	public String getStoreMail() {
+		return getValue(KEY_STORE_MAIL, "");
+	}
 
 
+	//to make customer id
+	public void setCustomerAutoIncreamentId(int sAutoincreamentId) {
+		putValue(KEY_CUSTOMER_AUTO_INCREAMENT_ID, sAutoincreamentId);
+	}
+	public int getCustomerAutoIncreamentId() {
+		return getValue(KEY_CUSTOMER_AUTO_INCREAMENT_ID, 0);
+	}
+
+	public void setCurrentCustomerId(String sCurrentOdrerId) {
+		putValue(KEY_CURRENT_CUSTOMER_ID, sCurrentOdrerId);
+	}
+	public String getCurrentCustomerId() {
+		return getValue(KEY_CURRENT_CUSTOMER_ID, "");
+	}
 }

@@ -1,8 +1,11 @@
+
 package com.ankit.pointofsolution.dialog_fragments;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
@@ -12,6 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ankit.pointofsolution.MainActivity;
 import com.ankit.pointofsolution.Models.Coupons;
 import com.ankit.pointofsolution.Models.Productdata;
 import com.ankit.pointofsolution.R;
@@ -39,6 +43,8 @@ public class AddItemCouponsFragment extends DialogFragment {
     View focusView = null;
     boolean cancel = false;
     private DBHelper dbHelper;
+    private Utility utility;
+    private GetResponseDialogListener activity;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -47,6 +53,7 @@ public class AddItemCouponsFragment extends DialogFragment {
         dialog.setContentView(R.layout.fragment_add_coupons__manually);
         pref = new Preferences(getActivity().getApplicationContext());
         dbHelper = new DBHelper(getActivity().getApplicationContext());
+        activity = (GetResponseDialogListener) getActivity();
         //dialog.setTitle("Title...");
         productdata = new Productdata();
         // set the custom dialog components - text, image and button
@@ -66,23 +73,57 @@ public class AddItemCouponsFragment extends DialogFragment {
                     focusView = eitemSkuCode;
                     cancel = true;
                 } else { //set data
-                    Utility utility = new Utility(pref, dbHelper);
+                    utility = new Utility(pref, dbHelper);
                     //dbHelper=new DBHelper(DBHelper.this);
-                    Coupons coupons = dbHelper.getItemCodeByCouponsCode(sitemSkuCode);
+                    final Coupons coupons = dbHelper.getItemCodeByCouponsCode(sitemSkuCode);
                     if (coupons.getCpItemSkuCode() != null) {
                         // TODO Auto-generated method stub
                         String currentTimestamp = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(new Date());
+                        int count=0;
                         if ((currentTimestamp.compareTo(coupons.getCpStartDate()) >= 0)
                                 && (currentTimestamp.compareTo(coupons.getCpEndDate()) <= 0) ) {
-                            //System.out.println("product data set");
-                            Productdata productdata = utility.getProductDetailsbyCouponsItemSku(coupons.getCpItemSkuCode());
-                            GetResponseDialogListener activity = (GetResponseDialogListener) getActivity();
-                            activity.updateResultSkuCode(productdata);
+                            //System.out.println("MainActivity123"+MainActivity.orderDetailsArrayList.size());
+                            for (int i=0;i<MainActivity.orderDetailsArrayList.size();i++) {
+
+                                System.out.println("narraylist:"+i+"---"+MainActivity.orderDetailsArrayList.get(i).getCouponsArrayList());
+                                if ((MainActivity.orderDetailsArrayList.get(i).getCouponsArrayList()!=null)
+                                        && (MainActivity.orderDetailsArrayList.get(i).getCouponsArrayList().get(0).getCpCouponSkuCode()!=null)
+                                                    && (!MainActivity.orderDetailsArrayList.get(i).getCouponsArrayList().get(0).getCpCouponSkuCode().equals(null)))
+                                {
+                                    if(MainActivity.orderDetailsArrayList.get(i).getCouponsArrayList().get(0)
+                                            .getCpItemSkuCode().equals(coupons.getCpItemSkuCode())) {
+                                        count++;
+                                    }
+
+                                }
+                            }
+                            if(count==1) {
+                                new AlertDialog.Builder(getActivity())
+                                        .setTitle(Messages.EXIST_COUPON)
+                                        .setMessage(Messages.REPLACE_COUPON)
+                                        .setNegativeButton(android.R.string.no, null)
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                                            public void onClick(DialogInterface arg0, int arg1) {
+                                                productdata = utility.getProductDetailsbyCouponsItemSku12(coupons.getCpItemSkuCode(),coupons.getCpCouponSkuCode());
+                                                activity.updateResultSkuCode(productdata);
+
+                                            }
+                                        }).create().show();
+
+                            }
+                            else{
+
+                                productdata = utility.getProductDetailsbyCouponsItemSku12(coupons.getCpItemSkuCode(),coupons.getCpCouponSkuCode());
+                                activity.updateResultSkuCode(productdata);
+
+                            }
                             dialog.hide();
                             dialog.cancel();
 
 
                         } else {
+
                             dialog.hide();
                             dialog.cancel();
                             Toast.makeText(getActivity(), Messages.EXPIRE_COUPON, Toast.LENGTH_SHORT).show();

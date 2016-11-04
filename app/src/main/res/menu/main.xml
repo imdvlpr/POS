@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
+    <item android:id="@+id/action_search"
+        android:title="Search"
+        android:icon="@drawable/ic_search_black"
+        app:showAsAction="collapseActionView|always"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        android:layout_width="wrap_content" />
     <item
         android:id="@+id/add_item"
         android:title="@string/add_item"
@@ -20,12 +25,7 @@
         android:title="@string/scan"
         android:icon="@drawable/bardcode_scanner"
         app:showAsAction="always" />
-    <item
-        android:id="@+id/search"
-        android:title="@string/search_title"
-        android:icon="@drawable/ic_search_white_36dp"
-        android:showAsAction="never"
-        android:actionViewClass="android.widget.SearchView" />
+
     <item
         android:id="@+id/action_logout"
         android:orderInCategory="100"

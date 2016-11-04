@@ -1,129 +1,252 @@
 package com.ankit.pointofsolution.adapter;
-/**
- * Created by Ankit on 03-Sep-16.
- */
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.res.Resources;
+import android.database.DataSetObserver;
+import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.view.Window;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.ankit.pointofsolution.MainActivity;
 import com.ankit.pointofsolution.Models.OrderDetails;
 import com.ankit.pointofsolution.R;
+import com.ankit.pointofsolution.config.Messages;
+import com.ankit.pointofsolution.dialog_fragments.RemoveItemODFragment;
+import com.ankit.pointofsolution.modules.OrdersDetailsActivity;
+import com.ankit.pointofsolution.storage.Preferences;
 
-import java.util.ArrayList;
+import java.util.List;
 
-/********* Adapter class extends with BaseAdapter and implements with OnClickListener ************/
-public class CustomAdapter extends BaseAdapter {
+public class CustomAdapter extends BaseExpandableListAdapter implements View.OnClickListener {
 
-    /*********** Declare Used Variables *********/
+    private Context _context;
     private Activity activity;
+    private List<OrderDetails> _listDataHeader; // header titles
+    private String qnty = "";
+    Preferences pref;
+    double itemqty = 0;
+    double itemprice;
+    double itemtotal;
+    double totalprice=0;
+    private  String c;
+    Resources res;
 
-    private static LayoutInflater inflater=null;
-    public Resources res;
-    private ArrayList<OrderDetails> data;
-    private double qty;
-    private double price;
-    private  double totalPrice;
-    /*************  CustomAdapter Constructor *****************/
-    public CustomAdapter(Activity a, ArrayList<OrderDetails> d,Resources resLocal) {
+    public CustomAdapter(Context context, List<OrderDetails> listDataHeader, Resources resources, Activity activity) {
+        this._context = context;
+        this._listDataHeader = listDataHeader;
+        this.res = resources;
+        this.activity = activity;
+    }
+    @Override
+    public void registerDataSetObserver(DataSetObserver observer) {
+        super.registerDataSetObserver(observer);
+    }
+    @Override
+    public Object getChild(int groupPosition, int childPosititon) {
+        return this._listDataHeader.get(groupPosition).getCouponsArrayList().size();
+    }
 
-        /********** Take passed values **********/
-        activity = a;
-        data=d;
-        res = resLocal;
-        System.out.println("sizearray"+data.size());
-        /***********  Layout inflator to call external xml layout () ***********/
-        inflater = ( LayoutInflater )activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    @Override
+    public long getChildId(int groupPosition, int childPosition) {
+        return childPosition;
+    }
+
+    @Override
+    public View getChildView(int groupPosition, final int childPosition,
+                             boolean isLastChild, View convertView, ViewGroup parent) {
+        System.out.println("getChildView groupPosition:"+groupPosition+"----childPosition------"+childPosition);
+        if(OrdersDetailsActivity.orderDetailsArrayList.get(groupPosition).getCouponsArrayList()!=null) {
+            final String childText = (String) OrdersDetailsActivity.orderDetailsArrayList.get(groupPosition).getCouponsArrayList()
+                    .get(childPosition).getCpCouponSkuCode();
+            final String childCouponvalue = (String) OrdersDetailsActivity.orderDetailsArrayList.get(groupPosition).getCouponsArrayList()
+                    .get(childPosition).getCpValue();
+            final double childCouponQty = OrdersDetailsActivity.orderDetailsArrayList.get(groupPosition).getItemQty();
+
+            if (convertView == null) {
+                LayoutInflater infalInflater = (LayoutInflater) this._context
+                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = infalInflater.inflate(R.layout.list_item, null);
+            }
+
+            TextView txtchildCouponvalue = (TextView) convertView.findViewById(R.id.LitemPrice);
+            TextView txtListChildCouponCode = (TextView) convertView.findViewById(R.id.couponcode);
+            TextView txtListChildCouponTotal = (TextView) convertView.findViewById(R.id.CouponItemTotal);
+
+            txtListChildCouponCode.setText(childText);
+            txtchildCouponvalue.setText(getRs(Double.parseDouble(childCouponvalue)));
+            double value = Double.parseDouble(childCouponvalue);
+            double couponTotalPrice = value * childCouponQty;
+
+            txtListChildCouponTotal.setText(getRs(couponTotalPrice));
+        }
+        return convertView;
 
     }
-    /******** What is the size of Passed Arraylist Size ************/
-    public int getCount() {
-        if(data.size()<=0)
-            return 1;
-        System.out.println("data.size"+data.size());
-        return data.size();
+
+    @Override
+    public int getChildrenCount(int groupPosition) {
+        System.out.println("groupPosition:"+_listDataHeader.get(groupPosition).getOrderId());
+        if(_listDataHeader.get(groupPosition).getCouponsArrayList()!=null)
+            return _listDataHeader.get(groupPosition).getCouponsArrayList().size();
+        else return 0;
+        // .size();
+        //return this._listDataChild.get(this._listDataHeader.get(groupPosition))
+        // .size();
     }
-    public Object getItem(int position) {
-        return position;
+
+    @Override
+    public Object getGroup(int groupPosition) {
+        return this._listDataHeader.get(groupPosition);
     }
-    public long getItemId(int position) {
-        return position;
+
+    @Override
+    public int getGroupCount() {
+        return this._listDataHeader.size();
     }
-    /********* Create a holder Class to contain inflated xml file elements *********/
-    public static class ViewHolder{
 
-        public TextView vitemName, vitemPrice, vitemTotal, vitemSku, vitemOrderId,vitemQty;
-        public LinearLayout linearLayout;
+    @Override
+    public long getGroupId(int groupPosition) {
+        return groupPosition;
     }
-    /****** Depends upon data size called for each row , Create each ListView row *****/
-    public View getView(final int position, View convertView, ViewGroup parent) {
 
-        View vi = convertView;
-        final ViewHolder holder;
-
+    @Override
+    public View getGroupView(final int groupPosition, boolean isExpanded,
+                             View convertView, ViewGroup parent) {
 
 
-        if(convertView==null){
+        if (convertView == null) {
+            LayoutInflater infalInflater = (LayoutInflater) this._context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = infalInflater.inflate(R.layout.customadapter, null);
+        }
 
-            /****** Inflate customadapter.xml file for each row ( Defined below ) *******/
-            vi = inflater.inflate(R.layout.order_detail_show_adapter, null);
+        TextView vitemName, vitemPrice, vitemTotal, vitemSku;
+        TextView vitemQty,moreQuantity;
+        LinearLayout linearLayout;
+        ImageView vitemRemove;
 
-            /****** View Holder Object to contain tabitem.xml file elements ******/
-            holder = new ViewHolder();
-            holder.linearLayout = (LinearLayout)vi.findViewById(R.id.Linearview);
-            holder.vitemName = (TextView) vi.findViewById(R.id.LitemName);
-            holder.vitemSku = (TextView) vi.findViewById(R.id.LitemSku);
-            holder.vitemPrice=(TextView)vi.findViewById(R.id.LitemPrice);
-            //holder.vitemOrderId=(TextView)vi.findViewById(R.id.LitemQty);
-            holder.vitemQty=(TextView)vi.findViewById(R.id.LitemQty);
-            //holder.moreQuantity=(TextView)vi.findViewById(R.id.moreQuantity);
-            holder.vitemTotal=(TextView)vi.findViewById(R.id.LItemTotal);
-            // holder.vitemOrderId.setText(data.get(position).getOrderId());
-            // double.Parsedouble
-            /************  Set holder with LayoutInflater ************/
-            vi.setTag(holder);
-            System.out.println("data.size()"+data.size());
+        linearLayout = (LinearLayout)convertView.findViewById(R.id.Linearview);
+        vitemName = (TextView) convertView.findViewById(R.id.LitemName);
+        vitemSku = (TextView) convertView.findViewById(R.id.LitemSku);
+        vitemPrice=(TextView)convertView.findViewById(R.id.LitemPrice);
+        //vitemQty=(Spinner)convertView.findViewById(R.id.LitemQty);
+        vitemQty=(TextView)convertView.findViewById(R.id.LitemQty);
+        moreQuantity=(TextView)convertView.findViewById(R.id.moreQuantity);
+        vitemTotal=(TextView)convertView.findViewById(R.id.LItemTotal);
+        vitemRemove = (ImageView) convertView.findViewById(R.id.itemRemove);
+
+        moreQuantity.setVisibility(View.INVISIBLE);
+        vitemRemove.setVisibility(View.INVISIBLE);
+        linearLayout.setVisibility(View.VISIBLE);
+        //vitemQty.setFocusable(true);
+        /************  Set Model values in Holder elements ***********/
+        //System.out.println("data details:"+(data.get(position).getItemQty())+"::::"+position);
+        itemqty = _listDataHeader.get(groupPosition).getItemQty();
+        itemprice = _listDataHeader.get(groupPosition).getItemPrice();
+        itemtotal = itemqty * itemprice;
+        vitemPrice.setText(getRs(itemprice));
+        vitemName.setText(_listDataHeader.get(groupPosition).getsItemName());
+        vitemSku.setText(_listDataHeader.get(groupPosition).getItemSku());
+        vitemTotal.setText(getRs(itemqty * itemprice));
+        vitemQty.setText(String.valueOf(itemqty));
+
+        //vitemQty.setSelection(0);
+        if(_listDataHeader.get(groupPosition).getCouponsArrayList()!=null) {
+            if(_listDataHeader.get(groupPosition).getCouponsArrayList().get(0).getCpValue()!=null &&
+                    Double.parseDouble(_listDataHeader.get(groupPosition).getCouponsArrayList().get(0).getCpValue())< (itemprice))
+            {
+                vitemTotal.setText(getRs((itemprice-Double.parseDouble(_listDataHeader.get(groupPosition).getCouponsArrayList()
+                        .get(0).getCpValue()))*itemqty));
+            }
         }
         else
-            holder=(CustomAdapter.ViewHolder)vi.getTag();
-
-        if(data.size()<=0)
         {
-            holder.vitemOrderId.setText("No Data");
+            itemtotal = itemqty * itemprice;
+            vitemTotal.setText(getRs(itemtotal));
         }
-        else
-        {
-            /***** Get each Model object from Arraylist ********/
-            holder.vitemName.setText(data.get(position).getsItemName());
-            holder.vitemSku.setText(data.get(position).getItemSku());
-            qty=data.get(position).getItemQty();
-            holder.vitemQty.setText(String.valueOf(qty));
-            price=data.get(position).getItemPrice();
-            holder.vitemPrice.setText(getRs(price));
-            totalPrice=qty*price;
-            holder.vitemTotal.setText(getRs(totalPrice));
+        totalprice = 0;
+        int count = 0;
+        for (int i = 0; i < OrdersDetailsActivity.orderDetailsArrayList.size(); i++) {
+            if(OrdersDetailsActivity.orderDetailsArrayList.get(i).getCouponsArrayList()!=null) {
+                c = OrdersDetailsActivity.orderDetailsArrayList.get(i).getCouponsArrayList().get(0).getCpValue();
+            }
+            else{
+                c=null;
+            }
+            if(c==null) {
+                totalprice = (OrdersDetailsActivity.orderDetailsArrayList.get(i).getItemQty() *
+                        OrdersDetailsActivity.orderDetailsArrayList.get(i).getItemPrice()) + totalprice;
+            }
+            else{
+                if(Double.parseDouble(OrdersDetailsActivity.orderDetailsArrayList.get(i).getCouponsArrayList().get(0).getCpValue())>
+                        OrdersDetailsActivity.orderDetailsArrayList.get(i).getItemPrice())
+                {
+                    totalprice = (OrdersDetailsActivity.orderDetailsArrayList.get(i).getItemQty() * OrdersDetailsActivity.orderDetailsArrayList.get(i)
+                            .getItemPrice()) + totalprice;
+                    count++;
 
+                }
+                else {
+
+                    totalprice = (OrdersDetailsActivity.orderDetailsArrayList.get(i).getItemQty() * OrdersDetailsActivity.orderDetailsArrayList.get(i)
+                            .getItemPrice()) + totalprice;
+                    totalprice = totalprice - (Integer.parseInt(OrdersDetailsActivity.orderDetailsArrayList.get(i).getCouponsArrayList().get(0)
+                            .getCpValue()) *
+                            OrdersDetailsActivity.orderDetailsArrayList.get(i).getItemQty());
+                }
+            }
         }
-        return vi;
+
+        if(count>0)
+        {
+            Toast.makeText(convertView.getContext(), Messages.INVALID_COUPON, Toast.LENGTH_SHORT).show();
+            count=0;
+        }
+        OrdersDetailsActivity.oTotalconut.setText(getRs(totalprice));
+        OrdersDetailsActivity.oitemCount.setText(String.valueOf(OrdersDetailsActivity.orderDetailsArrayList.size()));
+
+        vitemRemove.setOnClickListener(new CustomAdapter.OnItemClickListener(groupPosition));
+        moreQuantity.setOnClickListener(new CustomAdapter.OnItemClickListener(groupPosition));
+
+        return convertView;
     }
 
-    /**@Override
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
+
+    @Override
+    public boolean isChildSelectable(int groupPosition, int childPosition) {
+        return true;
+    }
+
+    @Override
     public void onClick(View v) {
         Log.v("CustomAdapter", "=====Row button clicked=====");
     }
 
-    ******* Called when Item click in ListView ***********
+    /********* Called when Item click in ListView ************/
     private class OnItemClickListener  implements View.OnClickListener {
         private int mPosition;
+
         OnItemClickListener(int position){
             mPosition = position;
         }
+
         @Override
         public void onClick(final View v) {
 
@@ -131,7 +254,7 @@ public class CustomAdapter extends BaseAdapter {
             switch(v.getId()) {
                 case R.id.moreQuantity: {
                     // do here code what u want on imagebutton click
-                    //qdialog(mPosition);
+                    qdialog(mPosition);
                     break;
                 }
                 case R.id.itemRemove: {
@@ -146,7 +269,30 @@ public class CustomAdapter extends BaseAdapter {
                 }
             }
         }
-    }*/
+    }
+
+    public void qdialog(final int position) {
+        final View[] focusView = {null};
+        final boolean[] cancel = {false};
+        final Dialog dialog = new Dialog(this._context);
+        dialog.setContentView(R.layout.fragment_add_item__spinner);
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(Toolbar.LayoutParams.FILL_PARENT, Toolbar.LayoutParams.WRAP_CONTENT);
+        final EditText equantity = (EditText) dialog.findViewById(R.id.quantity);
+
+        Button btnSaveButton = (Button) dialog
+                .findViewById(R.id.addQuantity);
+        btnSaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                qnty = equantity.getText().toString();
+                OrdersDetailsActivity.orderDetailsArrayList.get(position).setItemQty(Double.parseDouble(qnty));
+                MainActivity.listViewAdpter.notifyDataSetChanged();
+                dialog.hide();
+            }
+        });
+    }
     public String getRs(double total){
         return String.format(res.getString(R.string.Rs), String.format("%.02f", total));
     }

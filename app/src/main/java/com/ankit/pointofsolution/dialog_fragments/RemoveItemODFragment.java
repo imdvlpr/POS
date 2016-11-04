@@ -44,12 +44,11 @@ public class RemoveItemODFragment extends DialogFragment {
                             totalprice = (MainActivity.orderDetailsArrayList.get(i).getItemQty() *
                                     MainActivity.orderDetailsArrayList.get(i).getItemPrice())+totalprice;
                         }
-                         dbHelper.deleteOrderDetails(pref.getCurrentOdrerId(),
-                        MainActivity.orderDetailsArrayList.get(mPosition).getItemSku());
+                        dbHelper.deleteOrderDetails(pref.getCurrentOdrerId(),MainActivity.orderDetailsArrayList
+                                                .get(mPosition).getItemSku());
                         MainActivity.orderDetailsArrayList.remove(mPosition);
                         MainActivity.vTotalconut.setText(String.valueOf(totalprice));
                         MainActivity.itemCount.setText(String.valueOf(MainActivity.orderDetailsArrayList.size()));
-
                        //update adapter using notify function
                         MainActivity.listViewAdpter.notifyDataSetChanged();
                         //Check the size of list if there is no item then set invisible list also

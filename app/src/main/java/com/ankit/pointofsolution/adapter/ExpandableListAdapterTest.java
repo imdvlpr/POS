@@ -6,26 +6,27 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ankit.pointofsolution.MainActivity;
 import com.ankit.pointofsolution.Models.OrderDetails;
 import com.ankit.pointofsolution.R;
-import com.ankit.pointofsolution.config.Messages;
 import com.ankit.pointofsolution.dialog_fragments.RemoveItemODFragment;
 import com.ankit.pointofsolution.storage.Preferences;
 
 import java.util.List;
+import java.util.Locale;
 
 public class ExpandableListAdapterTest extends BaseExpandableListAdapter implements View.OnClickListener {
 
@@ -46,6 +47,7 @@ public class ExpandableListAdapterTest extends BaseExpandableListAdapter impleme
 		this._listDataHeader = listDataHeader;
 		this.res = resources;
 		this.activity = activity;
+		pref = new Preferences(activity);
 	}
 	@Override
 	public void registerDataSetObserver(DataSetObserver observer) {
@@ -64,29 +66,33 @@ public class ExpandableListAdapterTest extends BaseExpandableListAdapter impleme
 	@Override
 	public View getChildView(int groupPosition, final int childPosition,
 			boolean isLastChild, View convertView, ViewGroup parent) {
+		System.out.println("getChildView groupPosition:"+groupPosition+"----childPosition------"+childPosition);
+		if(MainActivity.orderDetailsArrayList.get(groupPosition).getCouponsArrayList()!=null) {
 			final String childText = (String) MainActivity.orderDetailsArrayList.get(groupPosition).getCouponsArrayList()
-																.get(childPosition).getCpCouponSkuCode();
+					.get(childPosition).getCpCouponSkuCode();
 			final String childCouponvalue = (String) MainActivity.orderDetailsArrayList.get(groupPosition).getCouponsArrayList()
-																.get(childPosition).getCpValue();
-			final  double childCouponQty = MainActivity.orderDetailsArrayList.get(groupPosition).getItemQty();
+					.get(childPosition).getCpValue();
+			final double childCouponQty = MainActivity.orderDetailsArrayList.get(groupPosition).getItemQty();
 
-		if (convertView == null) {
-			LayoutInflater infalInflater = (LayoutInflater) this._context
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			convertView = infalInflater.inflate(R.layout.list_item, null);
+			if (convertView == null) {
+				LayoutInflater infalInflater = (LayoutInflater) this._context
+						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				convertView = infalInflater.inflate(R.layout.list_item, null);
+			}
+
+			TextView txtchildCouponvalue = (TextView) convertView.findViewById(R.id.LitemPrice);
+			TextView txtListChildCouponCode = (TextView) convertView.findViewById(R.id.couponcode);
+			TextView txtListChildCouponTotal = (TextView) convertView.findViewById(R.id.CouponItemTotal);
+
+			txtListChildCouponCode.setText(childText);
+			txtchildCouponvalue.setText(getRs(Double.parseDouble(childCouponvalue)));
+			double value = Double.parseDouble(childCouponvalue);
+			double couponTotalPrice = value * childCouponQty;
+
+			txtListChildCouponTotal.setText(getRs(couponTotalPrice));
 		}
+			return convertView;
 
-		TextView txtchildCouponvalue = (TextView) convertView.findViewById(R.id.LitemPrice);
-		TextView txtListChildCouponCode = (TextView) convertView.findViewById(R.id.couponcode);
-		TextView txtListChildCouponTotal = (TextView) convertView.findViewById(R.id.CouponItemTotal);
-
-		txtListChildCouponCode.setText(childText);
-		txtchildCouponvalue.setText(getRs(Double.parseDouble(childCouponvalue)));
-		double value=Double.parseDouble(childCouponvalue);
-		double couponTotalPrice=value*childCouponQty;
-
-		txtListChildCouponTotal.setText(getRs(couponTotalPrice));
-		return convertView;
 	}
 
 	@Override
@@ -156,7 +162,7 @@ public class ExpandableListAdapterTest extends BaseExpandableListAdapter impleme
 		vitemName.setText(_listDataHeader.get(groupPosition).getsItemName());
 		vitemSku.setText(_listDataHeader.get(groupPosition).getItemSku());
 		vitemTotal.setText(getRs(itemqty * itemprice));
-		vitemQty.setText(String.valueOf(itemqty));
+		vitemQty.setText(String.valueOf(String.format("%.02f", itemqty)));
 
 		//vitemQty.setSelection(0);
 		if(_listDataHeader.get(groupPosition).getCouponsArrayList()!=null) {
@@ -198,19 +204,19 @@ public class ExpandableListAdapterTest extends BaseExpandableListAdapter impleme
 
 					totalprice = (MainActivity.orderDetailsArrayList.get(i).getItemQty() * MainActivity.orderDetailsArrayList.get(i)
 																		.getItemPrice()) + totalprice;
-					totalprice = totalprice - (Integer.parseInt(MainActivity.orderDetailsArrayList.get(i).getCouponsArrayList().get(0)
-														.getCpValue()) *
-							MainActivity.orderDetailsArrayList.get(i).getItemQty());
+					totalprice = totalprice - (Double.parseDouble(MainActivity.orderDetailsArrayList.get(i).getCouponsArrayList()
+												.get(0).getCpValue()) * MainActivity.orderDetailsArrayList.get(i).getItemQty());
 				}
 			}
 		}
 
-		if(count>0)
+		/*if(count>0)
 		{
 			Toast.makeText(convertView.getContext(), Messages.INVALID_COUPON, Toast.LENGTH_SHORT).show();
 			count=0;
-		}
+		}*/
 		MainActivity.vTotalconut.setText(getRs(totalprice));
+		pref.setPrice(String.valueOf(String.format("%.02f", totalprice)));
 		MainActivity.itemCount.setText(String.valueOf(MainActivity.orderDetailsArrayList.size()));
 		vitemRemove.setOnClickListener(new ExpandableListAdapterTest.OnItemClickListener(groupPosition));
 		moreQuantity.setOnClickListener(new ExpandableListAdapterTest.OnItemClickListener(groupPosition));
@@ -271,6 +277,8 @@ public class ExpandableListAdapterTest extends BaseExpandableListAdapter impleme
 		final Dialog dialog = new Dialog(this._context);
 		dialog.setContentView(R.layout.fragment_add_item__spinner);
 		dialog.show();
+		Window window = dialog.getWindow();
+		window.setLayout(Toolbar.LayoutParams.FILL_PARENT, Toolbar.LayoutParams.WRAP_CONTENT);
 		final EditText equantity = (EditText) dialog.findViewById(R.id.quantity);
 
 		Button btnSaveButton = (Button) dialog
@@ -287,5 +295,26 @@ public class ExpandableListAdapterTest extends BaseExpandableListAdapter impleme
 	}
 	public String getRs(double total){
 		return String.format(res.getString(R.string.Rs), String.format("%.02f", total));
+	}
+	public void filter(String charText) {
+
+		charText = charText.toLowerCase(Locale.getDefault());
+
+		//_listDataHeader.clear();
+		if (charText.length() > 0) {
+			/*_listDataHeader.addAll(_listDataHeader);
+
+		} else {*/
+			for (OrderDetails orderDetail : _listDataHeader) {
+				if (charText.length() != 0 && orderDetail.getItemSku().toLowerCase(Locale.getDefault()).contains(charText)) {
+					_listDataHeader.add(orderDetail);
+				}
+
+				else if (charText.length() != 0 && orderDetail.getItemSku().toLowerCase(Locale.getDefault()).contains(charText)) {
+					_listDataHeader.add(orderDetail);
+				}
+			}
+		}
+		notifyDataSetChanged();
 	}
 }

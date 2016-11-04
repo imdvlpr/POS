@@ -40,6 +40,11 @@ public class ApiManager {
     public static final String DEVICE_AUTHENTICATION = "authenticate_pos";
     public static final String USERS_DATA = "users_data";
     public static final String STORE_PRODUCT_DATA = "store_products";
+    public static final String DEVICE_DEACTIVE = "detactive_device";
+    public static final String POS_ORDER = "pos_order";
+    public static final String POS_CUSTOMER = "pos_customer";
+    public static final String POS_COUPONS = "pos_coupons";
+
     private Activity activity = null;
     private Context context = null;
 
@@ -50,12 +55,14 @@ public class ApiManager {
     private Utility utility;
     private DBHelper dbHelper;
     String posToken;
+    String sImei;
 
     public ApiManager(Activity activity) {
         this.activity = activity;
         pref = new Preferences(activity);
         dbHelper = new DBHelper(activity);
         utility = new Utility(pref, dbHelper);
+
     }
 
     /**
@@ -66,25 +73,27 @@ public class ApiManager {
      */
     public Status processDeviceAuth(String sVerificationCode) {
         this.status = Status.NONE;
-        //pref.getIMEI()
+        sImei = pref.getIMEI() ;//Constants.sIMEI
         String json= "";
+        String strLoginUrl;
+        if(sVerificationCode.equals(Constants.UNAUTHORIZED_USER))
+        {
+            strLoginUrl = API_SERVICE_URL + DEVICE_DEACTIVE;
 
-         String strLoginUrl = API_SERVICE_URL +  DEVICE_AUTHENTICATION;
+        }
+        else {
+            strLoginUrl = API_SERVICE_URL + DEVICE_AUTHENTICATION;
+        }
          try {
-           /* HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(strLoginUrl);
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-            nameValuePairs.add(new BasicNameValuePair("imei", sIMEI));
-            nameValuePairs.add(new BasicNameValuePair("deviceVerificationId", sVerificationCode));
-            httppost.setHeader("Content-type", "application/json");
-            L.log(sIMEI);
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            HttpResponse responseObj = httpclient.execute(httppost);*/
+
              JSONObject jsonObject = new JSONObject();
 
                  //HttpResponse response;
-                 jsonObject.accumulate("imei", Constants.sIMEI);
+             jsonObject.accumulate("imei", sImei);
+             if(!sVerificationCode.equals(Constants.UNAUTHORIZED_USER))
+             {
                  jsonObject.accumulate("deviceVerificationId", sVerificationCode);
+             }
                  json = jsonObject.toString();
                  System.out.println("json:"+json);
                  HttpClient httpClient = new DefaultHttpClient();
@@ -111,13 +120,16 @@ public class ApiManager {
                 this.status = Status.SUCCESS;
                 // On Success import data
                 JSONObject jsonObj = new JSONObject(response);
-                System.out.println("response:"+response);
+                //System.out.println("response:"+response);
                 if(jsonObj.has(Constants.POS_TOKEN))
                 {
                     posToken = jsonObj.getString(Constants.POS_TOKEN);
 
                     //Set postoken for future reference.
                     pref.setPosToken(posToken);
+                    pref.setStoreName(jsonObj.getString(Constants.STORE_NAME));
+                    pref.setStoreMail(jsonObj.getString(Constants.STORE_EMAIL));
+                    pref.setPosId(jsonObj.getString(Constants.POS_ID));
                     //call functions to get responses from the APIs
                     processImportUsersData();
                     processImportItemData();
@@ -177,6 +189,7 @@ public class ApiManager {
     public Status processImportUsersData() {
         this.status = Status.NONE;
         //getIMEI();
+        sImei = pref.getIMEI() ;//Constants.sIMEI
 
         String strLoginUrl = API_SERVICE_URL +  USERS_DATA;
         try {
@@ -184,7 +197,7 @@ public class ApiManager {
             HttpGet httpget = new HttpGet(strLoginUrl);
 
             httpget.addHeader("posToken",pref.getPosToken());
-            httpget.addHeader("imei",Constants.sIMEI);
+            httpget.addHeader("imei", sImei);
 
             HttpResponse responseObj = httpclient.execute(httpget);
             int status_code = responseObj.getStatusLine().getStatusCode();
@@ -258,24 +271,24 @@ public class ApiManager {
     public Status processImportItemData() {
         this.status = Status.NONE;
         //getIMEI();
+        sImei = pref.getIMEI() ;//Constants.sIMEI
 
         String strLoginUrl = API_SERVICE_URL +  STORE_PRODUCT_DATA;
         try {
             HttpClient httpclient = new DefaultHttpClient();
             HttpGet httpget = new HttpGet(strLoginUrl);
-            System.out.println("pref.getPosToken():"+pref.getPosToken());
+            //System.out.println("pref.getPosToken():"+pref.getPosToken());
             httpget.addHeader("posToken",pref.getPosToken());
-            httpget.addHeader("imei",Constants.sIMEI);
+            httpget.addHeader("imei", sImei);
 
             HttpResponse responseObj = httpclient.execute(httpget);
             int status_code = responseObj.getStatusLine().getStatusCode();
-            System.out.println("status_code : " + status_code);
+            //System.out.println("status_code : " + status_code);
             L.log("status_code : " + status_code);
             if (status_code == 200) {
                 HttpEntity resEntity = responseObj.getEntity();
                 response = EntityUtils.toString(resEntity);
             }
-            System.out.println("response items:"+ response);
             if (Validator.isEmpty(response)) {
                 this.status = Status.ERROR;
                 this.errorMsg = Messages.ACCESS_DENIED;
@@ -283,8 +296,12 @@ public class ApiManager {
                 JSONObject jsonObj = new JSONObject(response);
                 if(jsonObj.has(Constants.PRODUCTS)) {
                     this.status = Status.SUCCESS;
-                    System.out.println("response items123:"+ response);
+                    //System.out.println("response items123:"+ response);
                     utility.saveItemsindb(response);
+                    if(dbHelper.getAllOrders().size()>0) {
+                        processExpotOrdersData(utility.getAllOrdersJson());
+                    }
+                    //processExpotCustomerData();
                 }else if(jsonObj.has(Constants.API_STATUS))
                 {
                     this.status = Status.ERROR;
@@ -332,6 +349,177 @@ public class ApiManager {
         return status;
     }
 
+    /**
+     * Method which initialize the request to server and process. It will
+     * returns the status whether the request success of error.F
+     *
+     * @return Status value.
+     */
+    public Status processExpotOrdersData(String OrdersDetailsJson) {
+        this.status = Status.NONE;
+        sImei = pref.getIMEI() ;//Constants.sIMEI
+        //getIMEI();
+
+        String strLoginUrl = API_SERVICE_URL +  POS_ORDER;
+        try {
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost(strLoginUrl);
+            //System.out.println("pref.getPosToken():"+pref.getPosToken());
+            httpPost.addHeader("posToken",pref.getPosToken());
+            httpPost.addHeader("imei", sImei);
+            httpPost.addHeader("Content-Type","application/json");
+            StringEntity sEntity = new StringEntity(OrdersDetailsJson, "UTF-8");
+            httpPost.setEntity(sEntity);
+            HttpResponse responseObj = httpclient.execute(httpPost);
+            int status_code = responseObj.getStatusLine().getStatusCode();
+            L.log("status_code : " + status_code);
+            if (status_code == 200) {
+                HttpEntity resEntity = responseObj.getEntity();
+                response = EntityUtils.toString(resEntity);
+            }
+            if (Validator.isEmpty(response)) {
+                this.status = Status.ERROR;
+                this.errorMsg = Messages.ACCESS_DENIED;
+            } else {
+                JSONObject jsonObj = new JSONObject(response);
+                //System.out.println("orders details API :"+ jsonObj.toString());
+                if(jsonObj.has(Constants.API_MESSAGE)) {
+                    this.status = Status.SUCCESS;
+                    dbHelper.updateOrderStorageStatus();
+
+                    //utility.saveItemsindb(response);
+                }else if(jsonObj.has(Constants.API_STATUS))
+                {
+                    this.status = Status.ERROR;
+                    this.errorMsg = jsonObj.getString(Constants.API_MESSAGE);
+                }else{
+                    this.status = Status.ERROR;
+                    this.errorMsg = Messages.ACCESS_DENIED;
+                }
+            }
+        } catch (UnknownHostException uhEx) {
+            L.error(uhEx);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.NO_INTERNET;
+        } catch (HttpHostConnectException hhcEx) {
+            L.error(hhcEx);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ACCESS_DENIED;
+        } catch (HttpResponseException httpResEx) {
+            L.error(httpResEx);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ACCESS_DENIED;
+        } catch (SocketException exTO) {
+            L.error(exTO);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ERROR_PRECEDE
+                    + Messages.ACCESS_DENIED;
+        } catch (SocketTimeoutException exTO) {
+            L.error(exTO);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ERROR_PRECEDE + Messages.CONN_TIMEDOUT;
+        } catch (ConnectTimeoutException exTO) {
+            L.error(exTO);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ERROR_PRECEDE + Messages.CONN_TIMEDOUT;
+        } catch (FileNotFoundException ex) {
+            L.error(ex);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ERROR_PRECEDE + Messages.NO_API;
+        } catch (Exception ex) {
+            L.error(ex);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ERROR_GENERAL;
+        }
+        L.log("status = " + status);
+        return status;
+    }
+
+    /**
+     * Method which initialize the request to server and process. It will
+     * returns the status whether the request success of error.F
+     *
+     * @return Status value.
+     */
+    public Status processExpotCustomerData() {
+        this.status = Status.NONE;
+        //getIMEI();
+        sImei = pref.getIMEI() ;//Constants.sIMEI
+
+        String strLoginUrl = API_SERVICE_URL +  POS_CUSTOMER;
+        try {
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost(strLoginUrl);
+            System.out.println("pref.getPosToken():"+pref.getPosToken());
+            httpPost.addHeader("posToken",pref.getPosToken());
+            httpPost.addHeader("imei", sImei);
+            httpPost.addHeader("Content-Type","application/json");
+            StringEntity sEntity = new StringEntity(utility.getAllCustomerJson(), "UTF-8");
+            httpPost.setEntity(sEntity);
+
+            HttpResponse responseObj = httpclient.execute(httpPost);
+            int status_code = responseObj.getStatusLine().getStatusCode();
+            L.log("status_code : " + status_code);
+            if (status_code == 200) {
+                HttpEntity resEntity = responseObj.getEntity();
+                response = EntityUtils.toString(resEntity);
+            }
+            if (Validator.isEmpty(response)) {
+                this.status = Status.ERROR;
+                this.errorMsg = Messages.ACCESS_DENIED;
+            } else {
+                JSONObject jsonObj = new JSONObject(response);
+                //System.out.println("orders details API :"+ jsonObj.toString());
+                if(jsonObj.has(Constants.API_MESSAGE)) {
+                    this.status = Status.SUCCESS;
+                    dbHelper.updateCustomerStorageStatus();
+                    //utility.saveItemsindb(response);
+                }else if(jsonObj.has(Constants.API_STATUS))
+                {
+                    this.status = Status.ERROR;
+                    this.errorMsg = jsonObj.getString(Constants.API_MESSAGE);
+                }else{
+                    this.status = Status.ERROR;
+                    this.errorMsg = Messages.ACCESS_DENIED;
+                }
+            }
+        } catch (UnknownHostException uhEx) {
+            L.error(uhEx);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.NO_INTERNET;
+        } catch (HttpHostConnectException hhcEx) {
+            L.error(hhcEx);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ACCESS_DENIED;
+        } catch (HttpResponseException httpResEx) {
+            L.error(httpResEx);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ACCESS_DENIED;
+        } catch (SocketException exTO) {
+            L.error(exTO);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ERROR_PRECEDE
+                    + Messages.ACCESS_DENIED;
+        } catch (SocketTimeoutException exTO) {
+            L.error(exTO);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ERROR_PRECEDE + Messages.CONN_TIMEDOUT;
+        } catch (ConnectTimeoutException exTO) {
+            L.error(exTO);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ERROR_PRECEDE + Messages.CONN_TIMEDOUT;
+        } catch (FileNotFoundException ex) {
+            L.error(ex);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ERROR_PRECEDE + Messages.NO_API;
+        } catch (Exception ex) {
+            L.error(ex);
+            this.status = Status.ERROR;
+            this.errorMsg = Messages.ERROR_GENERAL;
+        }
+        L.log("status = " + status);
+        return status;
+    }
     /**
      * Enumeration values for the request status.
      *
@@ -386,7 +574,5 @@ public class ApiManager {
         Intent i = new Intent(activity, LoginActivity.class);
         activity.startActivity(i);
         activity.finish();
-
     }
-
 }

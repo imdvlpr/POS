@@ -3,22 +3,20 @@ package com.ankit.pointofsolution;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
-
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -29,22 +27,15 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.ankit.pointofsolution.Models.Userdata;
 import com.ankit.pointofsolution.config.Messages;
 import com.ankit.pointofsolution.storage.DBHelper;
 import com.ankit.pointofsolution.storage.Preferences;
 import com.ankit.pointofsolution.utility.Password;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -81,6 +72,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     boolean cancel = false;
     View focusView = null;
     DBHelper dbHelper;
+    private int countPass=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,8 +169,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
-
-
         // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
@@ -190,11 +180,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
-            cancel = true;
+            //cancel = true;
         } else if (!isEmailValid(email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
-            cancel = true;
+            //cancel = true;
         }
 
         if (cancel) {
@@ -352,11 +342,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             {
                 if(Password.checkPassword(mPassword,dbPassword))
                 { check="success";}
-                else  {  check="wrongpassword";  }
+                else  {
+                    countPass++;
+                    check="wrongpassword";
+                    if(countPass>3){
+                        String userid = dbHelper.getUserid(mEmail);
+                        dbHelper.deactiveUser(userid);
+                        }
+                }
             }
             else
-            {
-                check="wrongemail";
+            { check="wrongemail";
+
             }
 
             // TODO: register the new account here.
@@ -374,24 +371,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 pref.saveUsername(mEmail);
                 pref.savePassword(mPassword);
                 pref.setisLoggedin(true);
-                Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(LoginActivity.this,MainActivity.class));
                 finish();
                  }else
                 if(check.equals("wrongemail"))
                 {
                     mEmailView.setError(getString(R.string.error_invalid_email));
                     mEmailView.requestFocus();
+                    Toast.makeText(LoginActivity.this,Messages.MSG_INVALID_USER,Toast.LENGTH_LONG).show();
                 }
                 else
                 if(check.equals("wrongpassword"))
                 {
                     mPasswordView.setError(getString(R.string.error_incorrect_password));
                     mPasswordView.requestFocus();
+                    Toast.makeText(LoginActivity.this,Messages.MSG_INVALID_USER,Toast.LENGTH_LONG).show();
                 }
             } else {
                 mPasswordView.setError(Messages.INVALID_USERNAME_PWD);
                 mPasswordView.requestFocus();
+                Toast.makeText(LoginActivity.this,Messages.MSG_INVALID_USER,Toast.LENGTH_LONG).show();
             }
         }
 

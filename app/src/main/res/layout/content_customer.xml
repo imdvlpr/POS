@@ -3,98 +3,208 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <TextView
+    <ScrollView
+        android:id="@+id/scrollablecontents"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginTop="72dp"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:orientation="vertical"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+                <!-- ICON -->
+                <ImageView
+                    android:padding="3dp"
+                    android:id="@+id/username_icon"
+                    android:src="@drawable/user"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="10dp" />
+                <!-- INPUT -->
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/customername"
+                        android:layout_marginLeft="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/customer_name"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <!-- ICON -->
+                <ImageView
+                    android:padding="3dp"
+                    android:id="@+id/username_icon1"
+                    android:src="@drawable/email"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="10dp" />
+                <!-- INPUT -->
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/customeremail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/customer_email"
+                        android:imeActionId="@+id/customeremail"
+                        android:imeOptions="actionUnspecified"
+                        android:inputType="textEmailAddress"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+                <!-- ICON -->
+                <ImageView
+                    android:padding="3dp"
+                    android:id="@+id/username_icon2"
+                    android:src="@drawable/direc"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp" />
+                <!-- INPUT -->
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/customerstreet"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/customer_street"
+                        android:imeActionId="@+id/customerstreet"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+                <!-- ICON -->
+                <ImageView
+                    android:padding="3dp"
+                    android:id="@+id/username_icon3"
+                    android:src="@drawable/map"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp" />
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/customerplace"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/customer_place"
+                        android:imeActionId="@+id/customerplace"
+                        android:imeOptions="actionUnspecified"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+                <!-- ICON -->
+                <ImageView
+                    android:padding="3dp"
+                    android:id="@+id/username_icon4"
+                    android:src="@drawable/cell"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp" />
+                <!-- INPUT -->
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/customerphone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/customer_phone"
+                        android:imeActionId="@+id/customerphone"
+                        android:imeOptions="actionUnspecified"
+                        android:inputType="phone"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+            <Button
+                style="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/add"
+                android:id="@+id/addcustomer"
+                android:layout_gravity="center_horizontal"
+                android:background="#00a65a"
+                android:textColor="#FFFFFF"/>
+
+        </LinearLayout>
+    </ScrollView>
+    <!--<TextView
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:scaleType="center"
-        android:background="#FFFFBB33"
+        android:background="@color/colorPrimary"
         android:contentDescription="@string/customer_information"
         android:text="@string/add_customer"
+        android:textColor="@color/colorAccent1"
         android:textSize="25dp"
         android:textAlignment="center"
         android:paddingTop="15dp"/>
 
 
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
 
-        <EditText
-            android:id="@+id/customername"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/customer_name"
-            android:imeActionId="@+id/itemPrice"
-            android:inputType="text"
-            android:maxLines="1"
-            android:singleLine="true" />
 
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/customeremail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/customer_email"
-            android:imeActionId="@+id/customeremail"
-            android:imeOptions="actionUnspecified"
-            android:inputType="text"
-            android:maxLines="1"
-            android:singleLine="true" />
 
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/customerstreet"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/customer_street"
-            android:imeActionId="@+id/customerstreet"
-            android:maxLines="1"
-            android:singleLine="true" />
-
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/customerplace"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/customer_place"
-            android:imeActionId="@+id/customerplace"
-            android:imeOptions="actionUnspecified"
-            android:inputType="text"
-            android:maxLines="1"
-            android:singleLine="true" />
-
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/customerphone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/customer_phone"
-            android:imeActionId="@+id/customerphone"
-            android:imeOptions="actionUnspecified"
-            android:inputType="text"
-            android:maxLines="1"
-            android:singleLine="true" />
-
-    </android.support.design.widget.TextInputLayout>
     <Button
         style="?android:textAppearanceSmall"
         android:layout_width="match_parent"
@@ -104,6 +214,6 @@
         android:layout_marginRight="4dp"
         android:layout_marginBottom="16dp"
         android:text="@string/add"
-        android:id="@+id/addcustomer"/>
+        android:id="@+id/addcustomer"/>-->
 
 </LinearLayout>

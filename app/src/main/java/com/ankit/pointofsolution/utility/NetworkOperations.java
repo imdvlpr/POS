@@ -1,25 +1,13 @@
 package com.ankit.pointofsolution.utility;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.ankit.pointofsolution.R;
 import com.ankit.pointofsolution.api.ApiManager;
 import com.ankit.pointofsolution.config.Messages;
-import com.ankit.pointofsolution.config.StringUtils;
 
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.conn.ConnectTimeoutException;
@@ -32,8 +20,6 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
-
-import javax.net.ssl.SSLHandshakeException;
 
 /**
  * Created by Ankit on 26-Aug-16.
@@ -74,7 +60,7 @@ public class NetworkOperations {
                 //@Override
                // public void run() {
                     try {
-
+                        //Toast.makeText(context, Messages.IS_SERVER_ALIVE, Toast.LENGTH_SHORT).show();
                         HttpURLConnection urlc = (HttpURLConnection) (new URL(URL).openConnection());
                         urlc.setRequestProperty("User-Agent", "Test");
                         urlc.setRequestProperty("Connection", "close");
